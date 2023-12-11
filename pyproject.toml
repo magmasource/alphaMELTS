@@ -1,0 +1,32 @@
+[tool.poetry]
+name = "alphamelts"
+version = "0.1.0"
+description = ""
+authors = []
+readme = "README.md"
+packages = []
+
+[tool.poetry.group.main.dependencies]
+python = "^3.10"
+
+[tool.poetry.group.app.dependencies]
+alphamelts-app = { path = "workspaces/app", develop = true}
+
+[tool.poetry.group.lib.dependencies]
+alphamelts-lib = { path = "workspaces/lib", develop = true}
+
+[tool.poetry.group.lib-test.dependencies]
+alphamelts-lib = { path = "workspaces/lib", develop = true, extras=["test"]}
+
+[tool.poetry.group.cli.dependencies]
+alphamelts-cli = { path = "workspaces/cli", develop = true}
+
+[tool.poetry.group.app.dependencies]
+alphamelts-mat = { path = "workspaces/mat", develop = true}
+
+[tool.poetry.group.app.dependencies]
+alphamelts-py  = { path = "workspaces/py",  develop = true}
+
+[build-system]
+requires = ["poetry-core", "setuptools", "setuptools-cpp"]
+build-backend = "poetry.core.masonry.api"
