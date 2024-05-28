@@ -28,7 +28,9 @@ The most noticeable difference between alphaMELTS and other MELTS software is th
     Rutile fixed (error in Tfus inherited from Samsonov), and adjusted for pMELTS.
     Corundum adjusted for pMELTS, taking account of pMELTS adjustments to alumina liquid.
 
-More details will be listed in the GitHub Wiki and Changelog.
+All of these phases tended not stabilized to be when they should be. These properties of these phases are now closer to correct, but they may need to be suppressed if recreating past simulations or performing calculations outside the narrow composition range for which there are constraints.
+
+Details of other changes will be listed in the GitHub Wiki and Changelog.
 
 Installation
 ============
