@@ -173,6 +173,10 @@ catch
     warning("Could not find gmt")
 end
 
+% The MATLAB version plots landscape and does not crop correctly. For more details see:
+% https://forum.generic-mapping-tools.org/t/canvas-anomaly-in-matlab-regarding-gmt/4710
+
+			      
 if gmt_plot
     gmt ('basemap', '-R1000/1220/0/100 -JX-4i/3i -BWeSn+t"Melt composition" -Bx+l"T @.C system" -By+L"wt%"')
     gmt ('plot', '-R1000/1220/0/100 -Wthin,lightblue -Sc0.1', [temp sio2])
@@ -188,5 +192,5 @@ if gmt_plot
             'S 0.1i s 0.15i pink 0.25p 0.2i Na@-2@-O'};
     gmt ('legend', '-DjTL -F', specs);
     gmt ('end')
-    open GMT_PLot.pdf
+    open GMT_Plot.pdf
 end
