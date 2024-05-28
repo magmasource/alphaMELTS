@@ -1,5 +1,5 @@
-Examples
-========
+alphaMELTS Examples
+===================
 
 This directory contains examples of the 'tutorial' 'Quick start using MELTS' for various interfaces. It is intended for comparison with other versions of the tutorial that are hosted on the MELTS Software Users forum:
 
