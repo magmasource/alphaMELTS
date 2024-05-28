@@ -8,9 +8,9 @@ This directory contains examples of the 'tutorial' 'Quick start using MELTS' for
 
 The MATLAB and Python versions contain comments in the files, whereas the standalone app has a README (taken from the [forum example](https://magmasource.caltech.edu/forum/index.php/topic,975.0.html)). The R version is a proof of concept. The plan is to provide alphaMELTS for Python wrappers for R and Julia that handle the reticulate and PyCall libraries respecively.
 
-The [Generic Mapping Tools](https://www.generic-mapping-tools.org/) (GMT) program can be used to automate plotting on the command line and works well with standard alphaMELTS output. It also has Python and Julia wrappers (see [PyGMT](https://www.pygmt.org/latest/) and [GMT.jl](https://github.com/GenericMappingTools/GMT.jl)), as well as an older MATLAB interface ([GMT/MEX](https://github.com/GenericMappingTools/gmtmex)). The GMT_Plot.pdf figure should be reproducable with the standalone alphaMELTS app, the MATLAB version and Python / Jupyter notebook versions (with the small caveat that the MATLAB version does not rotate / crop the figure correctly).
+The [Generic Mapping Tools](https://www.generic-mapping-tools.org/) (GMT) program can be used to automate plotting on the command line and works well with standard alphaMELTS output. It also has Python and Julia wrappers (see [PyGMT](https://www.pygmt.org/latest/) and [GMT.jl](https://github.com/GenericMappingTools/GMT.jl)), as well as an older MATLAB interface ([GMT/MEX](https://github.com/GenericMappingTools/gmtmex)). The GMT_Plot.pdf figure should be reproducable with the standalone alphaMELTS app, the MATLAB version and Python / Jupyter notebook versions and provides a quick way to verify visually that the example has run correctly (with the small caveat that the MATLAB version does not rotate / crop the figure correctly).
 
-More examples can be MAGMA Source GitList site: https://magmasource.caltech.edu/gitlist/Workshops.git/
+More examples can be found on the MAGMA Source GitList site: https://magmasource.caltech.edu/gitlist/Workshops.git/
 
 These will eventually move to a dedicated site, to be hosted at alphamelts.caltech.edu.
 
