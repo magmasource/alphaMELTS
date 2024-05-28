@@ -21,10 +21,10 @@ alphamelts-lib = { path = "workspaces/lib", develop = true, extras=["test"]}
 [tool.poetry.group.cli.dependencies]
 alphamelts-cli = { path = "workspaces/cli", develop = true}
 
-[tool.poetry.group.app.dependencies]
+[tool.poetry.group.mat.dependencies]
 alphamelts-mat = { path = "workspaces/mat", develop = true}
 
-[tool.poetry.group.app.dependencies]
+[tool.poetry.group.py.dependencies]
 alphamelts-py  = { path = "workspaces/py",  develop = true}
 
 [build-system]

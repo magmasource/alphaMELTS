@@ -1,0 +1,19 @@
+#!/bin/sh
+
+# -i skips 2 columns to get Temperature, 4 columns to get SiO2 etc.
+gmt begin GMT_Plot pdf
+    gmt basemap -R1000/1220/0/100 -JX-4i/3i -BWeSn+t"Melt composition" -Bx+l"T @.C system" -By+L"wt %"
+    gmt plot Liquid_comp_tbl.txt -h4 -i2,4 -Wthin,lightblue -Sc0.1
+    gmt plot Liquid_comp_tbl.txt -h4 -i2,9 -Wthin,orange -Sc0.1
+    gmt plot Liquid_comp_tbl.txt -h4 -i2,11 -Wthin,magenta -Sc0.1
+    gmt plot Liquid_comp_tbl.txt -h4 -i2,14 -Wthin,gray -Sc0.1
+    gmt plot Liquid_comp_tbl.txt -h4 -i2,15 -Wthin,pink -Sc0.1
+    gmt legend -DjTL -F << END
+#S [dx1 symbol size fill pen [ dx2 text ]]
+S 0.1i s 0.15i lightblue 0.25p 0.2i SiO@-2@-
+S 0.1i s 0.15i orange 0.25p 0.2i FeO
+S 0.1i s 0.15i magenta 0.25p 0.2i MgO
+S 0.1i s 0.15i gray 0.25p 0.2i CaO
+S 0.1i s 0.15i pink 0.25p 0.2i Na@-2@-O
+END
+gmt end

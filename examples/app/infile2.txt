@@ -1,0 +1,17 @@
+ALPHAMELTS_CALC_MODE MELTS
+
+! <><> alphaMELTS run by psmith <><> 
+! Time started: Nov 17 2020 at 17:17 
+
+! Command line: -f infile.txt -s settings.txt -m Morb.melts -n Morb2.melts -l infile2.txt 
+
+! alphaMELTS menu input used: 
+
+1
+Morb2.melts 
+3
+2
+4
+0
+0
+x

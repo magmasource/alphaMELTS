@@ -2,3 +2,4 @@ workspaces/*/.venv
 workspaces/*/poetry.lock
 workspaces/*/poetry.toml
 .poetry.toml
+.DS_Store

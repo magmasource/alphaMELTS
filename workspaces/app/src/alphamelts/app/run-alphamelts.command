@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# run-alphamelts.command 2.2.0
+# run-alphamelts.command 2.3.0
 use strict;
 
 my (@argv2, $in_file, $settings_file, $melts_file, $log_file, $batch_file, $new_file, $old_file, $out_file, $column_file, $table_file, $table_row);
@@ -46,7 +46,7 @@ until (@argv2) {
 
     $debug = ($windows) ? '2>NUL' : '2>/dev/null';
 
-    $version = "2.02";
+    $version = "2.03";
     print "Checking for updates ... $version ... ";
     $newversion = ! system("curl -m1 https://magmasource.caltech.edu/alphamelts/alphameltsdate");
     if ($newversion) {

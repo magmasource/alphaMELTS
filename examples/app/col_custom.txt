@@ -1,0 +1,26 @@
+Name: col_custom.txt
+Header: Excel
+Format: csv              ! output a comma-delimited table that can be opened in Excel automatically by double-clicking in Finder/Explorer
+!Format: txt              ! output a tab-delimited table that can be opened in gnumeric automatically from the terminal command line
+!Padding: '0.0'
+
+File: System_main_tbl.txt
+Table: System
+Columns: index Pressure Temperature
+
+! custom expressions need to be at the end and are processed left to right; avoid special characters like in FeO* or Mg#
+File: Liquid_comp_tbl.txt
+Table: "Liquid Composition"
+Columns: SiO2 TiO2 Al2O3 Fe2O3 Cr2O3 FeO MnO MgO NiO CaO Na2O K2O P2O5 H2O CO2 FeOtot={FeO}+0.9*{Fe2O3} Mgnum=({MgO}/40.3044)/(({MgO}/40.3044)+({FeO}/71.8464)) Mgpc=100*{Mgnum}
+
+File: Phase_mass_tbl.txt
+Table: Phase
+Columns: liquid1 clinopyroxene1 clinopyroxene2 fluid1 olivine1 plagioclase1 spinel1
+
+Delimiter: comma        ! default input delimiter is space, but .tbl files are comma-delimited
+
+File: olivine.tbl
+Columns: fayalite,forsterite
+
+File: plagioclase.tbl
+Columns: albite,anorthite,highsanidine
