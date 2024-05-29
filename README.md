@@ -1,5 +1,4 @@
-alphaMELTS
-==========
+# alphaMELTS
 
 alphaMELTS started as a text menu-driven interface to subroutine versions of the MELTS ([Ghiorso & Sack, 1995](http://dx.doi.org/10.1007/s004100050036)), pMELTS ([Ghiorso et al., 2002](http://dx.doi.org/10.1029/2001GC000217)), and pHMELTS ([Asimow et al., 2004](http://dx.doi.org/10.1029/2003GC000568)) models of thermodynamic equilibrium in silicate systems. Formerly known as 'Adiabat_1ph', and described in a software brief in G-cubed ([Smith & Asimow, 2005](http://dx.doi.org/10.1029/2004GC000816)), it evolved to 'alphaMELTS' via Adiabat_1ph &rarr; A1ph &rarr; Alph &rarr; alpha &rarr; alphaMELTS.
 
@@ -7,15 +6,13 @@ alphaMELTS 2 was a complete rewrite incorporating the latest source code for Rhy
 
 Version 2.3.0 brings together standalone, MATLAB and Python versions that were previously posted and versioned in separate repositories. Source code for the underlying libalphaMELTS C library is available for browsing and an old Makefile is provided for reference. Workflows to build and package alphaMELTS interfaces on multiple platforms will be added soon, and comprehensive documentation and a software brief are upcoming.
 
-How does alphaMELTS compare to other versions of MELTS?
-=======================================================
+## How does alphaMELTS compare to other versions of MELTS?
 
-THe alphaMELTS suite of software packages is intended to bridge the middle ground in terms of ease of use and power. All versions have a small footprint and are relatively easy to install locally and natively on all platforms. It is simple to automate repetative tasks compared to graphical user interfaces (including the original (Rhyolite-)MELTS GUI and easyMelts) and does not require an internet connection (unlike MELTS for Excel). It has a gentler learning curve than ENKI's Thermoengine package for those new to Python, but not the same level of power and scalability that Thermoengine can offer.
+The alphaMELTS suite of software packages is intended to bridge the middle ground in terms of ease of use and power. All versions have a small footprint and are relatively easy to install locally and natively on all platforms. It is simple to automate repetative tasks compared to graphical user interfaces (including the original (Rhyolite-)MELTS GUI and easyMelts) and does not require an internet connection (unlike MELTS for Excel). It has a gentler learning curve than ENKI's Thermoengine package for those new to Python, but not the same level of power and scalability that Thermoengine can offer.
 
-alphaMELTS forms the base for MELTS calculations in [PetThermoTools](https://github.com/gleesonm1/PetThermoTools) - an open-source Python3 tool for performing phase equilibria calculations using the MELTS family or [Holland et al. (2018)](https://doi.org/10.1093/petrology/egy048) thermodynamic models. PetThermoTools is suitable all users whether they are new to Python or advanced users and can easy integrate with other open-source Python packages, such as [Thermobar](https://github.com/PennyWieser/Thermobar) and [PySulfSat](https://github.com/PennyWieser/PySulfSat).
+alphaMELTS forms the base for MELTS calculations in [PetThermoTools](https://github.com/gleesonm1/PetThermoTools), an open-source Python3 tool for performing phase equilibria calculations using the MELTS family or [Holland et al. (2018)](https://doi.org/10.1093/petrology/egy048) thermodynamic models. PetThermoTools is suitable for all users whether they are new to scripting or advanced users of Python and can easy integrate with other open-source Python packages, such as [Thermobar](https://github.com/PennyWieser/Thermobar) and [PySulfSat](https://github.com/PennyWieser/PySulfSat).
 
-Will I get the same results with alphaMELTS as other MELTS software?
-====================================================================
+## Will I get the same results with alphaMELTS as other MELTS software?
 
 You can see the forked xMELTS code and early (alpha)MELTS for MATLAB development on GitHub. Separate Git repositories for alphaMELTS 2 and alphaMELTS for MATLAB/Python are archived on the MAGMA Source GitList server.
 * https://github.com/magmasource/MAGMA
@@ -28,11 +25,14 @@ The most noticeable difference between alphaMELTS and other MELTS software is th
     Rutile fixed (error in Tfus inherited from Samsonov), and adjusted for pMELTS.
     Corundum adjusted for pMELTS, taking account of pMELTS adjustments to alumina liquid.
 
-All of these phases tended not stabilized to be when they should be. These properties of these phases are now closer to correct, but they may need to be suppressed if recreating past simulations or performing calculations outside the narrow composition range for which there are constraints.
+All of these phases tended not to be stabilized when they should have been. These properties of these phases are now closer to correct, but they may need to be suppressed if recreating past simulations or performing calculations outside the narrow composition range for which there are constraints.
 
 Details of other changes will be listed in the GitHub Wiki and Changelog.
 
-Installation
-============
+## Installation
 
 alphaMELTS has been repackaged so that users need only download the files needed for the interface (standalone app, MATLAB, or Python) and platform that they intend to use (Windows 10/11 PC, macOS Intel or Apple Silicon, or Linux PC). For now, the installation process for each interface is inherited from the separate packages / repositories and is documented in the GitHub Wiki.
+
+## Support
+
+
