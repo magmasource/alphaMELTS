@@ -31,7 +31,7 @@ Details of other changes will be listed in the GitHub Wiki and Changelog.
 
 ## Installation
 
-alphaMELTS has been repackaged so that users need only download the files needed for the interface (standalone app, MATLAB, or Python) and platform that they intend to use (Windows 10/11 PC, macOS Intel or Apple Silicon, or Linux PC). For now, the installation process for each interface is inherited from the separate packages / repositories and is documented in the GitHub Wiki.
+alphaMELTS has been repackaged so that users need only download the files needed for the interface (standalone app, MATLAB, or Python) and platform that they intend to use (Windows 10/11 PC, macOS Intel or Apple Silicon, or Linux PC). For now, the installation process for each interface is inherited from the separate packages / repositories and is documented in the GitHub Wiki. Click the drop down in the sidebar to the right to navigate to the correct set of instructions for installation and testing.
 
 ## Support
 
