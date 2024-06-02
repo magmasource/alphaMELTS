@@ -1,4 +1,5 @@
 # alphaMELTS
+[![DOI](https://zenodo.org/badge/724791740.svg)](https://zenodo.org/doi/10.5281/zenodo.11406234)
 
 alphaMELTS started as a text menu-driven interface to subroutine versions of the MELTS ([Ghiorso & Sack, 1995](http://dx.doi.org/10.1007/s004100050036)), pMELTS ([Ghiorso et al., 2002](http://dx.doi.org/10.1029/2001GC000217)), and pHMELTS ([Asimow et al., 2004](http://dx.doi.org/10.1029/2003GC000568)) models of thermodynamic equilibrium in silicate systems. Formerly known as 'Adiabat_1ph', and described in a software brief in G-cubed ([Smith & Asimow, 2005](http://dx.doi.org/10.1029/2004GC000816)), it evolved to 'alphaMELTS' via Adiabat_1ph &rarr; A1ph &rarr; Alph &rarr; alpha &rarr; alphaMELTS.
 
@@ -31,8 +32,10 @@ Details of other changes will be listed in the GitHub Wiki and Changelog.
 
 ## Installation
 
-alphaMELTS has been repackaged so that users need only download the files needed for the interface (standalone app, MATLAB, or Python) and platform that they intend to use (Windows 10/11 PC, macOS Intel or Apple Silicon, or Linux PC). For now, the installation process for each interface is inherited from the separate packages / repositories and is documented in the GitHub Wiki. Click the drop down in the sidebar to the right to navigate to the correct set of instructions for installation and testing.
+alphaMELTS has been repackaged so that users need only download the files needed for the interface (standalone app, MATLAB, or Python) and platform that they intend to use (Windows 10/11 PC, macOS Intel or Apple Silicon, or Linux PC). For now, the installation process for each interface is inherited from the separate packages / repositories and is documented in the [GitHub Wiki](https://github.com/magmasource/alphaMELTS/wiki). Click the drop down in the sidebar to the right to navigate to the correct set of instructions for installation and testing.
 
 ## Support
 
+Limited documentation is available in the 'docs' folder, and the 'tutorial' example is provided for each iterface in the 'examples' folder. You can also check the [MELTS Software Users Forum](https://magmasource.caltech.edu/forum/) both in the dedicated alphaMELTS 2 / alphaMELTS for MATLAB/Python area and elsewhere, as the answers to many queries apply to more than version of MELTS. You are welcome to email the alphaMELTS developers with queries about calculations you are trying do - please find our contact details on GitHub or see the [alphaMELTS 1.9 Support Page](https://magmasource.caltech.edu/alphamelts/support.php).
 
+If you have found a bug or want to make a feature request or suggestion, please check the [GitHub issues](https://github.com/magmasource/alphaMELTS/issues) and open a new issue if needed.
