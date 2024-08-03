@@ -28,7 +28,7 @@ The most noticeable difference between alphaMELTS and other MELTS software is th
 
 All of these phases tended not to be stabilized when they should have been. These properties of these phases are now closer to correct, but they may need to be suppressed if recreating past simulations or performing calculations outside the narrow composition range for which there are constraints.
 
-As of alphaMELTS 2.3.1 (released August 3, 2024) the fluid phase is always called 'fluid', regardless of which Rhyolite-MELTS or pMELTS model is being used. This differs from easyMelts and other MELTS software where the fluid phase is 'water' for pMELTS and Rhyolite-MELTS v1.0.2, and 'fluid' for the models that can include CO<sub>2</sub>.
+As of alphaMELTS 2.3.1 (released August 3, 2024) the fluid phase is always called 'fluid', regardless of which Rhyolite-MELTS or pMELTS model is being used. This differs from easyMelts and other MELTS software where the fluid phase is 'water' for models with pure-H<sub>2</sub>O fluid (Rhyolite-MELTS v1.0.2, pMELTS) and 'fluid' for the models that can include CO<sub>2</sub>.
 
 Details of other changes will be listed in the GitHub Wiki and Changelog.
 
