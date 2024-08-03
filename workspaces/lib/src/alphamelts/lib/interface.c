@@ -1100,27 +1100,21 @@ void doBatchFractionation(double fracOut) {
 #endif
                 }
         }
-        int haveWater = FALSE; //((calculationMode == MODE__MELTS) || (calculationMode == MODE_pMELTS));
         for (i=0; i<npc; i++) {
-            if ( haveWater && !silminState->fractionateFlu && !strcmp((char *) solids[i].label, "water")) continue;
-            if ( haveWater && !silminState->fractionateSol &&  strcmp((char *) solids[i].label, "water")) continue;
-            if (!haveWater && !silminState->fractionateFlu && !strcmp((char *) solids[i].label, "fluid")) continue;
-            if (!haveWater && !silminState->fractionateSol &&  strcmp((char *) solids[i].label, "fluid")) continue;
+            if (!silminState->fractionateFlu && !strcmp((char *) solids[i].label, "fluid")) continue;
+            if (!silminState->fractionateSol &&  strcmp((char *) solids[i].label, "fluid")) continue;
 
             for (ns=0; ns<(silminState->nSolidCoexist)[i]; ns++) {
 
 #ifdef PHMELTS_ADJUSTMENTS
-                if ( haveWater && silminState->fractionateFlu && !silminState->fracFluids[ns] && !strcmp((char *) solids[i].label, "water")) continue;
-                if (!haveWater && silminState->fractionateFlu && !silminState->fracFluids[ns] && !strcmp((char *) solids[i].label, "fluid")) continue;
+                if (silminState->fractionateFlu && !silminState->fracFluids[ns] && !strcmp((char *) solids[i].label, "fluid")) continue;
 
                 if (fracOut >= 1.0) { /* individual fractionation coefficients or default MASSIN */
-                    if      ( haveWater && !strcmp((char *) solids[i].label, "water")) fracIn = MAX(1.0 - silminState->fracFluids[ns], 0.0);
-                    else if (!haveWater && !strcmp((char *) solids[i].label, "fluid")) fracIn = MAX(1.0 - silminState->fracFluids[ns], 0.0);
+                    if (!strcmp((char *) solids[i].label, "fluid")) fracIn = MAX(1.0 - silminState->fracFluids[ns], 0.0);
                     else    fracIn = MAX(1.0 - silminState->fracSolids[i], 0.0); /* may evenutally pack like incSolids */
                 }
                 else { /* fractionation controlled by mass or vol frac, 'coefficients' act as flags */
-                    if      ( haveWater && !strcmp((char *) solids[i].label, "water") && (silminState->fracFluids[ns] == 0.0)) fracIn = 1.0;
-                    else if (!haveWater && !strcmp((char *) solids[i].label, "fluid") && (silminState->fracFluids[ns] == 0.0)) fracIn = 1.0;
+                         if (!strcmp((char *) solids[i].label, "fluid") && (silminState->fracFluids[ns] == 0.0)) fracIn = 1.0;
                     else if (silminState->fracSolids[i] == 0.0) fracIn = 1.0; /* may evenutally pack like incSolids */
                     else    fracIn = MIN(1.0 - fracOut, 1.0);
                 }

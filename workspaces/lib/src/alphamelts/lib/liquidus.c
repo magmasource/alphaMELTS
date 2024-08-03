@@ -310,7 +310,7 @@ int findWetLiquidus(void) {
             for (i=0, j=0; i<npc; i++) if ((solids[i].type == PHASE) && (solids[i].nr == 0 || (solids[i].nr > 0 && solids[i].convert != NULL))) {
                     oldIncSolids[j] = (silminState->incSolids)[j];
                     (silminState->incSolids)[j] = FALSE;
-                    if (!strcmp("water", solids[i].label) || !strcmp("fluid", solids[i].label)) (silminState->incSolids)[j] = TRUE;
+                    if (!strcmp("fluid", solids[i].label)) (silminState->incSolids)[j] = TRUE;
                     j++;
                 }
             while(!silmin());

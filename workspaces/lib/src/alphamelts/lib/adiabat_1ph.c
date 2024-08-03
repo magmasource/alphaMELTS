@@ -4,8 +4,6 @@
 
 #include "silmin.h"    /* SILMIN structures include file    */
 
-#include "alphamelts.h"
-
 #include "adiabat.h"
 #include "phmelts.h"
 #include "interface.h"
@@ -32,7 +30,8 @@
 #define APPEND 0
 
 static int ista = 0;
-int guessFlag = FALSE;
+int guessFlag = FALSE, modeFlag, ptpathFlag;
+double Pmax, Pmin, Tmax, Tmin;
 SilminState *startState = NULL, *oldState = NULL, *states = NULL;
 
 int adiabat_0ph(int equilibriumGuess)

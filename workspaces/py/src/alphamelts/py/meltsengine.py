@@ -750,8 +750,10 @@ class MELTSengine(object):
                     self.viscosity[phaseName] = visc.value
 
     def calcViscosityFromGRD(self, phaseList=None, *args):
-        ''' 'Supplemental Calculator' type calculation to get viscosity of of one or more liquids.
+        ''' 'Supplemental Calculator' type calculation to get viscosity of of one or more liquids using:
+            Giordano D, Russell JK, Dingwell DB (2008) Viscosity of magmatic liquids: A model. EPSL 271, 123-134.
             If composition(s) not passed, will use the contents of phaseComposition (grams).
+            Call this after calcPhaseProperties or calcMolarProperties to avoid the GRD viscosity being overwritten.
             System ('bulk') viscosity is not updated by this method; it always uses Shaw model and crystallinity.'''
         if self.calculationMode != self.status.getCalculationMode():
             if self.status.setCalculationMode(self.calculationMode):

@@ -18,13 +18,13 @@ until ($done) {
     $pwd =~ s/install.command//;
     $pwd = (($windows) ? '.\\' : './') unless ($pwd); # for 'perl ...' or Windows command line
     # for double-clicking on Mac or 'Open with' on Windows
-    unless (chdir "$pwd") { 
+    unless (chdir "$pwd") {
 	warn "Could not change to directory $pwd: $!";
 	last;
     }
-    
+
     if($windows) {
-	
+
 	$home = "$ENV{'USERPROFILE'}";
 	$home =~ s/^\"//;
 	$home =~ s/\"$//;
@@ -37,7 +37,7 @@ until ($done) {
 	$file = "alphamelts2.bat run-alphamelts.command.bat column-pick.command.bat file-format.command.bat";
 	# where.exe seems to hang if STDERR is redirected
 	@files = `for \%i in ($file) do \@find /v "echo off" \"\%~\$PATH:i\" 2> nul`;
-	
+
 	@files = grep {
 	    if (/.+/) {
 		chomp;
@@ -61,11 +61,11 @@ until ($done) {
 	if ($^O !~ /linux/) {
 	    $bin = ($ENV{'PATH'} =~ /^.*:*$bin:*.*/) ? $bin : "$home\/Documents\/bin";
 	}
-	
+
 	$file = "alphamelts2 run-alphamelts.command column-pick.command file-format.command";
 	@files = `which $file 2> /dev/null | xargs ls -go`;
 	@files = grep s/(.* \d\d\:\d\d)(.*) \-\> (.*)/$2 \-\> $3/, @files;
-	
+
 	# May only have alphamelts2 on Mac
 	if ($^O !~ /linux/) {
 	    $file = "run-alphamelts.command column-pick.command file-format.command";
@@ -78,7 +78,7 @@ until ($done) {
 	    @files2 = grep s/(.*\.command).*("; )(.*\.command).*/ $1 \-\> $3/, @files2;
 	    push @files, @files2;
 	}
-	
+
     }
 
     if (@files) {
@@ -110,18 +110,18 @@ until ($done) {
 
 	$_ = $files[$i];
 	unless (/^$/) {
-	    
+
 	    s/\s+$//;  # Trim any trailing white space
 	    s/\'/\"/g; # Windows can only deal with name enclosed in double quotes;
 	    s/^\"//;   # *nix can take single or double
 	    s/\"$//;   # Trim any leftover quotes from start and end of list
 
 	    # Fix any apostrophes in the name (if had single quotes or no quotes or double quotes originally)
-	    s/\"\\\"\"/\'/g || s/\\\"/\'/g || s/\"/\'/g;	    
+	    s/\"\\\"\"/\'/g || s/\\\"/\'/g || s/\"/\'/g;
 	    s/\\//g unless ($windows); # Remove escaping from any other characters (e.g. '(' and ')')
 
 	    (($i > 1) ? $examples = $_ : (($i > 0) ? $bin = $_ : $install = $_));
-	    
+
 	}
 
     }
@@ -153,11 +153,11 @@ until ($done) {
     last if (/^$/ || /^n/i);
     print "\n";
 
-    unless ((-d "$install") || (mkdir "$install")) { 
+    unless ((-d "$install") || (mkdir "$install")) {
 	warn "Could not make directory '$install': $!";
 	last;
     }
-    unless ((-d "$bin") || (mkdir "$bin")) { 
+    unless ((-d "$bin") || (mkdir "$bin")) {
 	warn "Could not make directory '$bin': $!";
 	last;
     }
@@ -165,7 +165,7 @@ until ($done) {
         warn "Could not make directory '$examples': $!";
         last;
     }
-    
+
     $program = '';
     if ($windows) {
 
@@ -214,10 +214,10 @@ until ($done) {
 		last;
 	    }
 	}
-	
+
 	if ($program) {
 	    $program .= '.exe';
-	    unless (open(BAT, ">$bin\\alphamelts2.bat")) { 
+	    unless (open(BAT, ">$bin\\alphamelts2.bat")) {
 		warn "Could not open alphamelts2.bat file: $!\n";
 		last;
 	    }
@@ -225,7 +225,7 @@ until ($done) {
 	    print BAT "\"$install\\$program\"\n";
 	    close(BAT);
 	    # extra in case there is a problem setting the Path
-	    unless (open(BAT, ">$install\\alphamelts2.bat")) { 
+	    unless (open(BAT, ">$install\\alphamelts2.bat")) {
 		warn "Could not open alphamelts2.bat file: $!\n";
 		last;
 	    }
@@ -281,9 +281,16 @@ until ($done) {
 	    $program = 'alphamelts_linux' if ((-f 'alphamelts_linux.bin') || (-f 'alphamelts_linux'));
 	}
 	elsif (!$windows) {
-	    $program = 'alphamelts_macos' if ((-f 'alphamelts_macos.bin') || (-f 'alphamelts_macos'));
+		if (-f 'alphamelts2_macos') {
+			# Intel binary (to be phased out eventually)
+			$program = 'alphamelts2_macos';
+		}
+		else {
+			# Apple Silicon (except v2.1.0 - 2.2.1, which were fat binaries)
+	    	$program = 'alphamelts_macos' if ((-f 'alphamelts_macos.bin') || (-f 'alphamelts_macos'));
+		}
 	}
-	    
+
 	if ((-f $program) && (-f "$program.bin")) {
 	    unless (rename $program, "$program\_bak") {
 		warn "Cannot rename old executable: $!";
@@ -313,7 +320,7 @@ until ($done) {
 		system "$^X file-format.command $file";
 	}
 
-	$done = 1; # perl's symlink function has no force	
+	$done = 1; # perl's symlink function has no force
 	# On Mac force will replace a regular file with a link to itself!
 	if ($program) {
 	    # extra in case there is a problem setting the Path
@@ -350,7 +357,7 @@ until ($done) {
 
 			# Script in Path was double-clicked (or opened in home space in Terminal)
 			print OUT "if [ \"\$PWD\" == \"\$HOME\" ]; then\n";
-			print OUT "argList=\$\@\n";			
+			print OUT "argList=\$\@\n";
 			print OUT "osascript -e 'on run(argv)' \\\n";
 
 			print OUT "-e 'tell application \"Finder\"' \\\n";
@@ -360,7 +367,7 @@ until ($done) {
 			print OUT "-e 'set myWin to window 1' \\\n";
 			print OUT "-e 'set thePath to (quoted form of POSIX path of (target of myWin as alias))' \\\n";
 			print OUT "-e 'end tell' \\\n";
-			
+
 			print OUT "-e 'if (thePath as String) = (quoted form of POSIX path of item 1 of argv as String) then' \\\n";
 			print OUT "-e 'tell application \"Terminal\"' \\\n";
 			print OUT "-e 'activate' \\\n";
@@ -376,16 +383,16 @@ until ($done) {
 			print OUT "-e 'do script \"\\\"$install/$file\\\"\ \" & (argList as String)' \\\n";
 			print OUT "-e 'end tell' \\\n";
 			print OUT "-e 'end if' \\\n";
-			
-			print OUT "-e 'end run' \\\n";			
+
+			print OUT "-e 'end run' \\\n";
 			print OUT "-- \"\$(dirname \$0)/\" \$argList\n";
 
 			# Script in Path opened elsewhere in Terminal
 			print OUT "else\n\"$install/$file\" \"\$\@\";\nfi\n";
-			
+
 			# Script not in Path was double-clicked (or opened in current folder in Terminal)
 			print OUT "else\ncd \$(dirname \$0);\n\"$install/$file\" \"\$\@\";\nfi\n";
-			
+
 			close(OUT);
 			(chmod 0755, "$bin/$file") || warn "Could not make all files executable!\n";
 		    }
@@ -399,7 +406,7 @@ until ($done) {
 		$done = '';
 	    }
 	}
-	
+
 	unless ($done) {
 	    warn "Warning: could not make all links! Please check that the links directory is writable.\n";
 	    warn "Also, please ensure that the installation and links directories are not the same.\n";
@@ -427,12 +434,12 @@ until ($done) {
 		close(BASH);
 	    }
 	}
-	
+
     }
-    
+
     my $copy = ($windows) ? 'copy /Y' : 'cp -f'; # perl's copy requires a module to be installed
     # fudge instead of trying to escape the backslashed on Windows
-    if (($examples ne $pwd."tutorial") && ($examples ne $pwd."/tutorial")) {	
+    if (($examples ne $pwd."tutorial") && ($examples ne $pwd."/tutorial")) {
 	@files = glob $pwd.(($windows) ? "\\" : "/")."tutorial".(($windows) ? "\\" : "/").'*.*';
 	$done = 1;
 	for $file (@files) {
@@ -446,7 +453,7 @@ until ($done) {
 	}
 
     }
-	
+
     @files = glob '*-*.command';
     push @files, $program if ($program);
 

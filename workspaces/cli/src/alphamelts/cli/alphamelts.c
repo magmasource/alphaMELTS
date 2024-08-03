@@ -32,7 +32,7 @@
     { char *buf = readline("Press any key to continue.\n"); if (ilog) fprintf(logfile, "\n"); free(buf); }
 
 static int iAmInitialized = FALSE;
-extern int guessFlag;
+//extern int guessFlag;
 
 void printmenu(int iprint) {
 
@@ -510,6 +510,7 @@ int main(int argc, char** argv) {
                     if (!strncmp(buf, "all", MIN(len, 3))) {
                         i = -1;
                     }
+                    // All called fluid now but keep so old batch files work
                     else if (!strncmp(buf, "water", MIN(len, 5)) || !strncmp(buf, "fluid", MIN(len, 5))) {
                         i = npc;
                     }
@@ -549,8 +550,7 @@ int main(int argc, char** argv) {
                             if (incSolids < -1) {
                                 for (i=0, j=0; i<npc; i++) if (solids[i].type == PHASE) {
                                         int phaseStrLen = strlen(solids[i].label);
-                                        if (strncmp(solids[i].label, "water", MIN(phaseStrLen, 5)) && strncmp(solids[i].label, "fluid", MIN(phaseStrLen, 5)) &&
-                                            (solids[i].inStdSet) && silminState->incSolids[j]) break;
+                                        if (strncmp(solids[i].label, "fluid", MIN(phaseStrLen, 5)) && (solids[i].inStdSet) && silminState->incSolids[j]) break;
                                         j++;
                                 }
                                 incSolids = (i != npc) ? -1 : 0;
@@ -720,7 +720,7 @@ int main(int argc, char** argv) {
             else {
                 char *buf;
 
-      	int haveWater = ((calculationMode == MODE__MELTS) || (calculationMode == MODE_pMELTS));
+              	int haveWater = ((calculationMode == MODE__MELTS) || (calculationMode == MODE_pMELTS));
                 while ((buf = readline((haveWater) ? "Phase(s) to change settings for ('liquid', 'liquid n', where n>=1, or 'fluid' or 'water'; 'x' when done): " :
                     "Phase(s) to change settings for ('liquid', 'liquid n', where n>=1, or 'fluid'; 'x' when done): ")) != NULL) {
 
@@ -738,12 +738,12 @@ int main(int argc, char** argv) {
                             else if (j < 1 || j > nlc) j = 0;
                         }
                     }
-                    // All called fluid now
+                    // All called fluid now but keep so old batch files work
                     else if (haveWater && !strncmp(buf, "water", MIN(len, 5))) {
                         for (i=0, j=0; i<npc; i++) {
                             if (solids[i].type == PHASE) {
                                 int phaseStrLen = (int) strlen(solids[i].label);
-                                if (((len-phaseStrLen)  == 0) && !strncmp("water", solids[i].label, phaseStrLen)) {
+                                if (((len-phaseStrLen)  == 0) && !strncmp("fluid", solids[i].label, phaseStrLen)) {
                                     break;
                                 }
                                 j++;

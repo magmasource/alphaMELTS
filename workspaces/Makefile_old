@@ -1,0 +1,515 @@
+#
+# Build configuration (DEBUG unless RELEASE set)
+# ============================================================
+
+ifneq ($(RELEASE),)
+override DEBUG =
+else
+DEBUG = true
+endif
+
+ifneq ($(DEBUG),)
+BUILDDIR = build/Debug
+else
+BUILDDIR = build/Release
+endif
+
+ifneq ($(WINDOWS),)
+ARCH := win64
+ROOTDIR1 = /usr/x86_64-w64-mingw32
+ROOTDIR2 = /usr/x86_64-w64-mingw32
+ROOTDIR3 = /usr/x86_64-w64-mingw32
+else
+ARCH := $(shell uname)
+endif
+
+ifeq ($(ARCH),Darwin)
+ARCH := macos
+ifeq ($(shell uname -m), x86_64)
+ROOTDIR1 = /usr/local
+ROOTDIR2 = /usr/local/opt
+else
+ifneq ($(INTELMAC),)
+ROOTDIR1 = /usr/local
+ROOTDIR2 = /usr/local/opt
+else
+ROOTDIR1 = /opt/homebrew
+ROOTDIR2 = /opt/homebrew/opt
+endif
+endif
+ifneq ($(RELEASE),)
+ROOTDIR3 = /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr
+else
+ROOTDIR3 = /usr
+endif
+endif
+
+ifeq ($(ARCH),Linux)
+ARCH := linux
+ROOTDIR1 = /usr
+ROOTDIR2 = /usr
+ROOTDIR3 = /usr
+ROOTDIR4 = /x86_64-linux-gnu
+endif
+
+# Targets
+# =======
+
+ifeq ($(MAKEDIR),)
+
+RM       = rm
+RMFLAGS  = -rf
+
+MAKEDIR = $(CURDIR)
+RMFILE = *.so *.dylib *.dll
+
+libphmelts:
+	mkdir -p $(MAKEDIR)/$@/$(BUILDDIR)
+	$(RM) $(RMFLAGS) $(addprefix $@/$(BUILDDIR)/, $(RMFILE))
+	$(MAKE) $@ -C $@/$(BUILDDIR) -f $(MAKEDIR)/Makefile_new \
+	BATCH="$(BATCH)" DEBUG=$(DEBUG) DYNAMIC=$(DYNAMIC) MAKEDIR=$(MAKEDIR) \
+	TARGET=$@
+	touch includes/phmelts.h
+
+libalphamelts: libphmelts
+	mkdir -p $(MAKEDIR)/$@/$(BUILDDIR)
+	$(RM) $(RMFLAGS) $(addprefix $@/$(BUILDDIR)/, $(RMFILE))
+	$(MAKE) $@ -C $@/$(BUILDDIR) -f $(MAKEDIR)/Makefile_new \
+	BATCH="$(BATCH)" DEBUG=$(DEBUG) DYNAMIC=$(DYNAMIC) MAKEDIR=$(MAKEDIR) \
+	TARGET=$@
+	touch includes/alphamelts.h
+
+TARGETS = alphamelts test-meltsLib
+.PHONY: libphmelts libalphamelts $(TARGETS)
+
+test-meltsLib: libphmelts
+	mkdir -p $(MAKEDIR)/$@/$(BUILDDIR)
+	$(MAKE) $@ -C $@/$(BUILDDIR) -f $(MAKEDIR)/Makefile_new \
+	BATCH="$(BATCH)" DEBUG=$(DEBUG) DYNAMIC=$(DYNAMIC) MAKEDIR=$(MAKEDIR) \
+	TARGET=$@
+
+alphamelts: libalphamelts
+	mkdir -p $(MAKEDIR)/$@/$(BUILDDIR)
+	$(MAKE) $@ -C $@/$(BUILDDIR) -f $(MAKEDIR)/Makefile_new \
+	BATCH="$(BATCH)" DEBUG=$(DEBUG) DYNAMIC=$(DYNAMIC) MAKEDIR=$(MAKEDIR) \
+	TARGET=$@
+
+CLEANFILES = libphmelts/build/Debug/* libphmelts/build/Release/* \
+             libalphamelts/build/Debug/* libalphamelts/build/Release/*
+CLEANFILES += $(addsuffix /build/Debug/*, $(TARGETS))
+CLEANFILES += $(addsuffix /build/Release/*, $(TARGETS))
+OBJFILES   += lib/*.o
+OBJFILES   += $(addsuffix $*.o, $(CLEANFILES))
+
+clean:
+	$(RM) $(RMFLAGS) $(OBJFILES)
+
+realclean:
+	$(RM) $(RMFLAGS) $(OBJFILES) $(CLEANFILES)
+
+else
+
+#
+# Compiler choice and flags (floating point problems may require for cc add -std -ieee_with_no_inexact)
+# =====================================================================================================
+
+AR       = ar
+ARFLAGS  = rv
+
+ifeq ($(ARCH),linux)
+ARFLAGS  = rvU
+endif
+ifeq ($(ARCH),win64)
+ARFLAGS	 = rvU
+endif
+
+FC       = gfortran
+ifeq ($(ARCH),win64)
+FC       = x86_64-w64-mingw32-gfortran
+endif
+FFLAGS   = -ffree-form -g3
+
+ifeq ($(BATCH),)
+ifneq ($(DYNAMIC),)
+override BATCH = -DPHMELTS_ADJUSTMENTS
+else
+override BATCH = -DPHMELTS_ADJUSTMENTS -DALPHAMELTS_UPDATE_SYSTEM
+endif
+endif
+
+CC       = clang
+CFLAGS   += -Wall \
+	-D_USE_ISOC99 -D_ISOC99_SOURCE $(BATCH) -DHAVE_INLINE \
+	-DBATCH_VERSION -DRHYOLITE_ADJUSTMENTS -DDO_NOT_PRODUCE_OUTPUT_FILES \
+	-I$(ROOTDIR1)/include -I$(ROOTDIR3)/include/ -I$(MAKEDIR)/includes -I$(MAKEDIR)
+
+ifneq ($(DEBUG),)
+CFLAGS   += -g3
+else
+CFLAGS   += -O3 -DLIBXML_STATIC
+endif
+
+ifeq ($(ARCH),macos)
+ifneq ($(INTELMAC),)
+CFLAGS   += -arch x86_64
+endif
+CFLAGS   += -I$(ROOTDIR2)/readline/include/readline -I$(ROOTDIR2)/libxml2/include/libxml2 \
+	-I$(ROOTDIR2)/icu4c/include
+ifneq ($(RELEASE),)
+CFLAGS   += -Wno-nullability-completeness -isysroot $(ROOTDIR3)
+endif
+else
+CFLAGS	+= -I$(ROOTDIR2)/include/readline -I$(ROOTDIR2)/include/libxml2
+endif
+
+ifeq ($(ARCH),win64)
+ifneq ($(USEGCC),)
+CC       = x86_64-w64-mingw32-gcc
+else
+CC       = x86_64-w64-mingw32-clang
+endif
+CFLAGS   += -DMINGW -DWINDOWS
+endif
+ifeq ($(ARCH),linux)
+ifneq ($(USEGCC),)
+CC       = gcc
+CFLAGS   += -Wno-unused-but-set-variable -Wno-array-bounds -Wno-misleading-indentation
+endif
+CFLAGS   += -fPIC
+endif
+
+LD       = clang++
+RANLIB   = ranlib
+RM       = rm
+RMFLAGS  = -f
+
+CP       = cp
+CPFLAGS  = -i
+
+# Loader flags (default is shared, add -non_shared)
+# =================================================
+
+ifeq ($(ARCH),win64)
+ifneq ($(USEGCC),)
+LD       = x86_64-w64-mingw32-g++
+else
+LD       = x86_64-w64-mingw32-clang++
+endif
+else
+ifneq ($(USEGCC),)
+LD       = g++
+endif
+endif
+
+LDFLAGS =
+ifeq ($(ARCH),macos)
+ifneq ($(INTELMAC),)
+LDFLAGS   += -arch x86_64
+endif
+ifneq ($(RELEASE),)
+LDFLAGS += -isysroot $(ROOTDIR3) -mmacosx-version-min=13.0
+endif
+endif
+
+SONAME = so
+ifeq ($(ARCH),macos)
+SONAME = dylib
+endif
+ifeq ($(ARCH),win64)
+SONAME = dll
+endif
+
+# directories for sources and include files
+# =========================================
+
+vpath %.c $(MAKEDIR)/$(TARGET)
+vpath %.h $(MAKEDIR)/includes
+
+# Libraries for c functions and math functions etc.
+# =================================================
+
+LIBDIRS = -L$(ROOTDIR1)/lib \
+	-L$(ROOTDIR1)/lib$(ROOTDIR4) -L$(ROOTDIR3)/lib$(ROOTDIR4) \
+	-L$(MAKEDIR)/libphmelts/$(BUILDDIR) -L$(MAKEDIR)/libalphamelts/$(BUILDDIR)
+
+ifeq ($(ARCH),macos)
+LIBDIRS += -L$(ROOTDIR2)/readline/lib -L$(ROOTDIR2)/libxml2/lib
+endif
+
+ifeq ($(ARCH),win64)
+LIBS = -lgsl -lgslcblas -lxml2 -lz -lws2_32 -luuid -lm
+else
+LIBS = -lgsl -lgslcblas -lxml2 -lz -lm
+endif
+
+ifneq ($(RELEASE),)
+ifeq ($(ARCH),win64)
+PUBLIBS = $(ROOTDIR1)/lib/libgsl.a $(ROOTDIR1)/lib/libgslcblas.a \
+	$(ROOTDIR1)/lib/libxml2.a $(ROOTDIR1)/lib/libz.a \
+	$(ROOTDIR1)/lib/liblzma.a $(ROOTDIR1)/lib/libiconv.a \
+	$(ROOTDIR1)/lib/libedit_static.a $(ROOTDIR1)/lib/libgdi32.a \
+	$(ROOTDIR1)/lib/libcomdlg32.a $(ROOTDIR1)/lib/libssp.a \
+	-static-libstdc++ -lstdc++fs -static-libgcc -lws2_32 -luuid -lm
+else
+PUBLIBS = $(ROOTDIR1)/lib$(ROOTDIR4)/libgsl.a $(ROOTDIR1)/lib$(ROOTDIR4)/libgslcblas.a
+ifeq ($(ARCH),linux)
+PUBLIBS	+= $(ROOTDIR2)/lib$(ROOTDIR4)/libreadline.a $(ROOTDIR2)/lib$(ROOTDIR4)/libhistory.a \
+	$(ROOTDIR1)/lib$(ROOTDIR4)/libxml2.a $(ROOTDIR1)/lib$(ROOTDIR4)/libicuuc.a \
+	$(ROOTDIR1)/lib$(ROOTDIR4)/libicudata.a $(ROOTDIR1)/lib$(ROOTDIR4)/libicui18n.a \
+	$(ROOTDIR1)/lib$(ROOTDIR4)/liblzma.a $(ROOTDIR2)/lib$(ROOTDIR4)/libncurses.a \
+	$(ROOTDIR2)/lib$(ROOTDIR4)/libtinfo.a -lz -static-libstdc++ -lstdc++fs -static-libgcc -ldl -lm
+else
+PUBLIBS	+= $(ROOTDIR2)/readline/lib/libreadline.a $(ROOTDIR2)/readline/lib/libhistory.a \
+	$(ROOTDIR2)/icu4c/lib/libicuuc.a $(ROOTDIR2)/icu4c/lib/libicudata.a \
+	$(ROOTDIR2)/icu4c/lib/libicui18n.a $(ROOTDIR2)/xz/lib/liblzma.a \
+	-lz -liconv -lncurses -lm
+endif
+endif
+else
+ifeq ($(ARCH),win64)
+PUBLIBS = -ledit $(LIBS)
+else
+PUBLIBS = -lreadline $(LIBS)
+endif
+endif
+
+
+# Random access library of MELTS support functions
+#=================================================
+
+MELTSDYNAMICLIB = libphmelts.a
+ALPHAMELTSLIB = libalphamelts.a
+
+ifneq ($(DYNAMIC),)
+ifeq ($(ARCH),macos)
+override DYNAMIC = -dynamiclib
+else
+override DYNAMIC = -shared
+endif
+MELTSLIBS = -lalphamelts -lphmelts
+else
+MELTSLIBS = $(MAKEDIR)/libalphamelts/$(BUILDDIR)/libalphamelts.a $(MAKEDIR)/libphmelts/$(BUILDDIR)/libphmelts.a
+endif
+
+(%.o): %.c\
+	$(CC) $(CFLAGS) $<
+	$(AR) $(ARFLAGS) $@ $*.o
+#	$(RM) $(RMFLAGS) $*.o
+
+MELTSDYLIB = $(addsuffix .$(SONAME), $(basename $(MELTSDYNAMICLIB)))
+ALPHAMELTSDYLIB = $(addsuffix .$(SONAME), $(basename $(ALPHAMELTSLIB)))
+
+ifeq ($(ARCH),macos)
+DYFLAGS = -dynamiclib
+else
+DYFLAGS = -shared
+endif
+
+%.$(SONAME): %.a
+	$(AR) xv $<
+	$(CP) $(CPFLAGS) *.o $(MAKEDIR)/lib/
+	$(LD) $(LDFLAGS) $(DYFLAGS) -o $@ $(MAKEDIR)/lib/*.o $(LIBDIRS) $(LIBS)
+	$(CP) $(CPFLAGS) $@ $(MAKEDIR)/lib/
+
+SILMINH = silmin.h mthread.h
+TRACEDATAH = trace_data.h trace.h
+
+# Targets
+# =======
+
+alphamelts.h: adiabat.h \
+	phmelts.h
+	touch ../../../includes/alphamelts.h
+
+phmelts.h: lawson_hanson.h \
+	liq_struct_data.h \
+	mthread.h \
+	nash.h \
+	param_struct_data.h \
+	param_struct_data_CO2.h \
+	param_struct_data_CO2_H2O.h \
+	param_struct_data_v34.h \
+	melts_gsl.h \
+    silmin.h \
+	sol_struct_data.h
+	touch ../../../includes/phmelts.h
+
+libphmelts: $(MELTSDYNAMICLIB) $(MELTSDYLIB)
+libalphamelts: $(ALPHAMELTSLIB) $(ALPHAMELTSDYLIB)
+
+# Object module dependencies (modules in MELTSLIBS)
+# ================================================
+
+$(MELTSDYNAMICLIB)(albite.o):                   albite.c melts_gsl.h silmin.h mthread.h
+$(MELTSDYNAMICLIB)(alloy-liquid.o):             alloy-liquid.c silmin.h
+$(MELTSDYNAMICLIB)(alloy-solid.o):              alloy-solid.c silmin.h
+$(MELTSDYNAMICLIB)(clinoamphibole.o):           clinoamphibole.c melts_gsl.h silmin.h mthread.h
+$(MELTSDYNAMICLIB)(orthoamphibole.o):           orthoamphibole.c melts_gsl.h silmin.h mthread.h
+$(MELTSDYNAMICLIB)(biotite.o):                  biotite.c silmin.h
+$(MELTSDYNAMICLIB)(biotite-taj.o):              biotite-taj.c silmin.h
+$(MELTSDYNAMICLIB)(check_coexisting_liquids.o): check_coexisting_liquids.c lawson_hanson.h nash.h melts_gsl.h silmin.h
+$(MELTSDYNAMICLIB)(check_coexisting_solids.o):  check_coexisting_solids.c lawson_hanson.h nash.h melts_gsl.h silmin.h
+$(MELTSDYNAMICLIB)(clinopyroxene.o):            clinopyroxene.c melts_gsl.h silmin.h mthread.h
+$(MELTSDYNAMICLIB)(cummingtonite.o):            cummingtonite.c melts_gsl.h silmin.h mthread.h
+$(MELTSDYNAMICLIB)(equality_constraints.o):     equality_constraints.c lawson_hanson.h melts_gsl.h silmin.h
+$(MELTSDYNAMICLIB)(est_saturation_state.o):     est_saturation_state.c lawson_hanson.h nash.h silmin.h
+$(MELTSDYNAMICLIB)(est_sat-state_revised.o):    est_sat-state_revised.c silmin.h
+$(MELTSDYNAMICLIB)(evaluate_saturation.o):      evaluate_saturation.c melts_gsl.h silmin.h
+$(MELTSDYNAMICLIB)(feldspar.o):                 feldspar.c silmin.h
+$(MELTSDYNAMICLIB)(fluid.o):                    fluid.c silmin.h
+$(MELTSDYNAMICLIB)(fluid-phase.o):              fluid-phase.c silmin.h
+$(MELTSDYNAMICLIB)(garnet.o):                   garnet.c silmin.h
+$(MELTSDYNAMICLIB)(gibbs.o):                    gibbs.c melts_gsl.h silmin.h
+$(MELTSDYNAMICLIB)(gradient_hessian.o):         gradient_hessian.c lawson_hanson.h melts_gsl.h silmin.h
+$(MELTSDYNAMICLIB)(hornblende.o):               hornblende.c silmin.h
+$(MELTSDYNAMICLIB)(ilmenite.o):                 ilmenite.c silmin.h
+$(MELTSDYNAMICLIB)(initial_guess.o):            initial_guess.c interface.h silmin.h
+$(MELTSDYNAMICLIB)(kalsilite.o):                kalsilite.c melts_gsl.h silmin.h
+$(MELTSDYNAMICLIB)(lawson_hanson.o):            lawson_hanson.c lawson_hanson.h
+$(MELTSDYNAMICLIB)(leucite.o):                  leucite.c melts_gsl.h silmin.h
+$(MELTSDYNAMICLIB)(linear_search.o):            linear_search.c silmin.h
+$(MELTSDYNAMICLIB)(liquid.o):                   liquid.c param_struct_data.h melts_gsl.h silmin.h mthread.h
+$(MELTSDYNAMICLIB)(liquid-co2.o):               liquid-co2.c param_struct_data_CO2.h melts_gsl.h silmin.h mthread.h
+$(MELTSDYNAMICLIB)(liquid-co2-h2o.o):           liquid-co2-h2o.c param_struct_data_CO2_H2O.h melts_gsl.h silmin.h mthread.h
+$(MELTSDYNAMICLIB)(liquidus.o):                 liquidus.c melts_gsl.h silmin.h status.h
+$(MELTSDYNAMICLIB)(liquid_v34.o):               liquid_v34.c param_struct_data_v34.h silmin.h
+$(MELTSDYNAMICLIB)(majorite.o):                 majorite.c silmin.h
+$(MELTSDYNAMICLIB)(melilite.o):                 melilite.c melts_gsl.h silmin.h mthread.h
+$(MELTSDYNAMICLIB)(melts_linalg.o):             melts_linalg.c melts_gsl.h
+$(MELTSDYNAMICLIB)(melts_support.o):            melts_support.c silmin.h melts_gsl.h
+$(MELTSDYNAMICLIB)(melts_threads.o):            melts_threads.c silmin.h mthread.h
+$(MELTSDYNAMICLIB)(mthread.o):                  mthread.c mthread.h
+$(MELTSDYNAMICLIB)(nash.o):                     nash.c nash.h
+$(MELTSDYNAMICLIB)(nepheline.o):                nepheline.c melts_gsl.h silmin.h mthread.h
+$(MELTSDYNAMICLIB)(olivine.o):                  olivine.c melts_gsl.h silmin.h mthread.h
+$(MELTSDYNAMICLIB)(olivine-sx.o):               olivine-sx.c melts_gsl.h silmin.h
+$(MELTSDYNAMICLIB)(ortho-oxide.o):              ortho-oxide.c melts_gsl.h silmin.h mthread.h
+$(MELTSDYNAMICLIB)(orthopyroxene.o):            orthopyroxene.c melts_gsl.h silmin.h mthread.h
+$(MELTSDYNAMICLIB)(perovskite.o):               perovskite.c silmin.h
+$(MELTSDYNAMICLIB)(phmelts_support.o):          phmelts_support.c silmin.h
+$(MELTSDYNAMICLIB)(plagioclase.o):              plagioclase.c silmin.h
+$(MELTSDYNAMICLIB)(read_write.o):               read_write.c silmin.h
+$(MELTSDYNAMICLIB)(rhombohedral.o):             rhombohedral.c melts_gsl.h silmin.h mthread.h
+$(MELTSDYNAMICLIB)(rhomsghiorso.o):             rhomsghiorso.c melts_gsl.h silmin.h mthread.h
+$(MELTSDYNAMICLIB)(ringwoodite.o):              ringwoodite.c silmin.h
+$(MELTSDYNAMICLIB)(silmin.o):                   silmin.c lawson_hanson.h nash.h melts_gsl.h silmin.h status.h
+$(MELTSDYNAMICLIB)(silmin_support.o):           silmin_support.c melts_gsl.h silmin.h
+$(MELTSDYNAMICLIB)(spinel.o):                   spinel.c melts_gsl.h silmin.h mthread.h
+$(MELTSDYNAMICLIB)(sub-solidus-mu-o2.o):        sub-solidus-mu-o2.c melts_gsl.h silmin.h
+$(MELTSDYNAMICLIB)(sub-thermo-calc.o):          sub-thermo-calc.c silmin.h
+$(MELTSDYNAMICLIB)(wadsleyite.o):               wadsleyite.c silmin.h
+$(MELTSDYNAMICLIB)(water.o):                    water.c silmin.h
+$(MELTSDYNAMICLIB)(wustite.o):                  wustite.c silmin.h
+$(MELTSDYNAMICLIB)(recipes.o):                  recipes.c recipes.h
+
+$(ALPHAMELTSLIB)(adiabat_1ph.o):           adiabat_1ph.c adiabat.h silmin.h
+$(ALPHAMELTSLIB)(adiabat_support.o):       adiabat_support.c adiabat.h interface.h silmin.h status.h
+$(ALPHAMELTSLIB)(alphamelts_interface.o):  alphamelts_interface.c alphamelts.h silmin.h
+$(ALPHAMELTSLIB)(alphamelts_support.o):    alphamelts_support.c alphamelts.h silmin.h
+$(ALPHAMELTSLIB)(interface.o):             interface.c interface.h silmin.h status.h
+$(ALPHAMELTSLIB)(library.o):               library.c adiabat.h liq_struct_data.h sol_struct_data.h status.h
+$(ALPHAMELTSLIB)(subbasic_read_write.o):   subbasic_read_write.c
+
+#$(PHMELTSLIBS)(liquid_H2O.o):               liquid_H2O.c param_struct_data_v34.h silmin_H2O.h mthread.h
+
+# Object module dependencies (other than libraries)
+# ================================================
+
+$(MELTSDYNAMICLIB): $(MELTSDYNAMICLIB)(albite.o) \
+                    $(MELTSDYNAMICLIB)(alloy-liquid.o) \
+                    $(MELTSDYNAMICLIB)(alloy-solid.o) \
+                    $(MELTSDYNAMICLIB)(clinoamphibole.o) \
+                    $(MELTSDYNAMICLIB)(orthoamphibole.o) \
+                    $(MELTSDYNAMICLIB)(biotite.o) \
+                    $(MELTSDYNAMICLIB)(biotite-taj.o) \
+                    $(MELTSDYNAMICLIB)(check_coexisting_liquids.o) \
+                    $(MELTSDYNAMICLIB)(check_coexisting_solids.o) \
+                    $(MELTSDYNAMICLIB)(clinopyroxene.o) \
+                    $(MELTSDYNAMICLIB)(cummingtonite.o) \
+                    $(MELTSDYNAMICLIB)(equality_constraints.o) \
+                    $(MELTSDYNAMICLIB)(est_saturation_state.o) \
+                    $(MELTSDYNAMICLIB)(est_sat-state_revised.o) \
+                    $(MELTSDYNAMICLIB)(evaluate_saturation.o) \
+                    $(MELTSDYNAMICLIB)(feldspar.o) \
+                    $(MELTSDYNAMICLIB)(fluid.o) \
+                    $(MELTSDYNAMICLIB)(fluid-phase.o) \
+                    $(MELTSDYNAMICLIB)(garnet.o) \
+                    $(MELTSDYNAMICLIB)(gibbs.o) \
+                    $(MELTSDYNAMICLIB)(gradient_hessian.o) \
+                    $(MELTSDYNAMICLIB)(hornblende.o) \
+                    $(MELTSDYNAMICLIB)(ilmenite.o) \
+                    $(MELTSDYNAMICLIB)(initial_guess.o) \
+                    $(MELTSDYNAMICLIB)(kalsilite.o) \
+                    $(MELTSDYNAMICLIB)(lawson_hanson.o) \
+                    $(MELTSDYNAMICLIB)(leucite.o) \
+                    $(MELTSDYNAMICLIB)(linear_search.o) \
+                    $(MELTSDYNAMICLIB)(liquid.o) \
+                    $(MELTSDYNAMICLIB)(liquid-co2.o) \
+                    $(MELTSDYNAMICLIB)(liquid-co2-h2o.o) \
+                    $(MELTSDYNAMICLIB)(liquidus.o) \
+                    $(MELTSDYNAMICLIB)(liquid_v34.o) \
+                    $(MELTSDYNAMICLIB)(majorite.o) \
+                    $(MELTSDYNAMICLIB)(melilite.o) \
+                    $(MELTSDYNAMICLIB)(melts_linalg.o) \
+                    $(MELTSDYNAMICLIB)(melts_support.o) \
+                    $(MELTSDYNAMICLIB)(melts_threads.o) \
+                    $(MELTSDYNAMICLIB)(mthread.o) \
+                    $(MELTSDYNAMICLIB)(nash.o) \
+                    $(MELTSDYNAMICLIB)(nepheline.o) \
+                    $(MELTSDYNAMICLIB)(olivine.o) \
+                    $(MELTSDYNAMICLIB)(olivine-sx.o) \
+                    $(MELTSDYNAMICLIB)(ortho-oxide.o) \
+                    $(MELTSDYNAMICLIB)(orthopyroxene.o) \
+                    $(MELTSDYNAMICLIB)(perovskite.o) \
+		    $(MELTSDYNAMICLIB)(phmelts_support.o) \
+                    $(MELTSDYNAMICLIB)(plagioclase.o) \
+                    $(MELTSDYNAMICLIB)(read_write.o) \
+                    $(MELTSDYNAMICLIB)(rhombohedral.o) \
+                    $(MELTSDYNAMICLIB)(rhomsghiorso.o) \
+                    $(MELTSDYNAMICLIB)(ringwoodite.o) \
+                    $(MELTSDYNAMICLIB)(silmin.o) \
+                    $(MELTSDYNAMICLIB)(silmin_support.o) \
+                    $(MELTSDYNAMICLIB)(spinel.o) \
+                    $(MELTSDYNAMICLIB)(sub-solidus-mu-o2.o) \
+                    $(MELTSDYNAMICLIB)(sub-thermo-calc.o) \
+                    $(MELTSDYNAMICLIB)(wadsleyite.o) \
+                    $(MELTSDYNAMICLIB)(water.o) \
+                    $(MELTSDYNAMICLIB)(wustite.o) \
+                    $(MELTSDYNAMICLIB)(recipes.o)
+	$(RANLIB) $(MELTSDYNAMICLIB)
+
+$(ALPHAMELTSLIB):   $(ALPHAMELTSLIB)(adiabat_1ph.o) \
+                    $(ALPHAMELTSLIB)(adiabat_support.o) \
+                    $(ALPHAMELTSLIB)(alphamelts_interface.o) \
+                    $(ALPHAMELTSLIB)(alphamelts_support.o) \
+                    $(ALPHAMELTSLIB)(interface.o) \
+		    $(ALPHAMELTSLIB)(library.o) \
+		    $(ALPHAMELTSLIB)(subbasic_read_write.o)
+	$(RANLIB) $(ALPHAMELTSLIB)
+
+# Routines
+# ========
+
+#update.o
+ifneq ($(WINDOWS),)
+alphamelts: alphamelts.o interface.h alphamelts.h phmelts.h
+	$(LD) $(LDFLAGS) -o $@ alphamelts.o $(LIBDIRS) $(MELTSLIBS) $(PUBLIBS)
+	$(CP) $(CPFLAGS) $@.exe $(MAKEDIR)/bin/$@_$(ARCH).exe
+
+test-meltsLib: test-meltsLib.o alphamelts.h phmelts.h
+	$(LD) $(LDFLAGS) -o $@ test-meltsLib.o $(LIBDIRS) $(MELTSLIBS) $(LIBS)
+	$(FC) $(FFLAGS) $(LDFLAGS) -o test-dynamicLib ../../test-dynamicLib.f $(LIBDIRS) $(MELTSLIBS) $(LIBS)
+else
+alphamelts: alphamelts.o interface.h alphamelts.h phmelts.h
+	$(LD) $(LDFLAGS) -o $@ alphamelts.o $(LIBDIRS) $(MELTSLIBS) $(PUBLIBS)
+	chmod 755 $@
+	$(CP) $(CPFLAGS) $@ $(MAKEDIR)/bin/$@_$(ARCH)
+
+test-meltsLib: test-meltsLib.o alphamelts.h phmelts.h
+	$(LD) $(LDFLAGS) -o $@ test-meltsLib.o $(LIBDIRS) $(MELTSLIBSS) $(LIBS)
+	chmod 755 $@
+	$(FC) $(FFLAGS) $(LDFLAGS) -o test-dynamicLib ../../test-dynamicLib.f $(LIBDIRS) $(MELTSLIBS) $(LIBS)
+	chmod 755 test-dynamicLib
+endif
+
+endif

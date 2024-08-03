@@ -6,7 +6,7 @@ classdef MELTSdynamic < matlab.mixin.Copyable
 
         % The alphaMELTS for MATLAB/Python version (for reference).
         % Will be updated from the C library of MELTS functions.
-        version = '1.2.0beta'
+        version = '2.3'
         % User-defined name and/or description for the MELTSdynamic list.
         title
         % Integer value used to tell the C library of MELTS functions which MELTS mode to use.

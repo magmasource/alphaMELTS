@@ -2,6 +2,7 @@
 #define _alphaMelts_h
 
 #include "adiabat.h"
+#include "phmelts.h"
 
 void splashScreen(double newestversion);
 int assignGlobalStatics(int mode);
@@ -22,32 +23,5 @@ int menu_option8(int i, int j, int incSolids, int fracSolids, int minType, doubl
 int menu_option9(int i, int j, int incSolids, int fracSolids, int minType, double newMin);
 
 int menu_option13(char *filename);
-
-void startingSolution(void);
-int adiabatFunc();
-
-double fractionateSolids();
-double extractMelt();
-
-#define PTPATH 0
-#define ISENTHALPIC 1
-#define ISENTROPIC 2
-#define ISOCHORIC 3
-#define ISOTHERMAL 4
-#define ISOBARIC 5
-#define PTFILE 1
-#define PTGRID 2
-#define PSEUDOSECTION 3
-#define GEOTHERMAL 4
-
-extern int modeFlag, ptpathFlag, guessFlag;
-
-int adiabat_0ph(int equilibriumGuess);
-int adiabat_1ph(int equilibriumGuess, int saveAll, int iterMax, int noprint);
-
-void printPhases();
-
-extern double Pmax, Pmin, Tmax, Tmin;
-extern SilminState *startState, *oldState, *states;
 
 #endif

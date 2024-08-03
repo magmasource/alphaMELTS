@@ -9,7 +9,7 @@ class MELTSdynamic(object):
         Calculation mode needs to be set to one of: 1. rhyolite-MELTS 1.0.2; 2. pMELTS; 3. rhyolite-MELTS 1.1.0; 4. rhyolite-MELTS 1.2.0. '''
 
     # The alphaMELTS for MATLAB/Python version (for reference). Will be updated from the C library of MELTS functions.
-    version = '1.2.0beta'
+    version = '2.3'
     # User-defined name and/or description for the MELTSdynamic list.
     title = None
     # Integer value used to tell the C library of MELTS functions which MELTS mode to use.

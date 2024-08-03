@@ -922,8 +922,6 @@ int putOutputDataToFile(char *fileName)
 
   if (silminState->fractionateSol || silminState->fractionateFlu) {
     for (j=0; j<npc; j++) {
-      if ( silminState->fractionateSol && !silminState->fractionateFlu && !strcmp((char *) solids[j].label, "water")) continue;
-      if (!silminState->fractionateSol &&  silminState->fractionateFlu &&  strcmp((char *) solids[j].label, "water")) continue;
       if ( silminState->fractionateSol && !silminState->fractionateFlu && !strcmp((char *) solids[j].label, "fluid")) continue;
       if (!silminState->fractionateSol &&  silminState->fractionateFlu &&  strcmp((char *) solids[j].label, "fluid")) continue;
 #ifdef PHMELTS_ADJUSTMENTS
@@ -1501,14 +1499,11 @@ int putSequenceDataToXmlFile(int active) {
         rc = sprintf(temporary, "%23.16e", silminState->fracMass); rc = xmlTextWriterWriteFormatElement(writer, BAD_CAST "mass", "%s", temporary);
 
         if (silminState->fractionateSol || silminState->fractionateFlu) {
-            int haveWater = FALSE; // ((calculationMode == MODE__MELTS) || (calculationMode == MODE_pMELTS));
             for (j=0; j<npc; j++) {
                 int ns;
 
-                if ( haveWater &&  silminState->fractionateSol && !silminState->fractionateFlu && !strcmp((char *) solids[j].label, "water")) continue;
-                if ( haveWater && !silminState->fractionateSol &&  silminState->fractionateFlu &&  strcmp((char *) solids[j].label, "water")) continue;
-                if (!haveWater &&  silminState->fractionateSol && !silminState->fractionateFlu && !strcmp((char *) solids[j].label, "fluid")) continue;
-                if (!haveWater && !silminState->fractionateSol &&  silminState->fractionateFlu &&  strcmp((char *) solids[j].label, "fluid")) continue;
+                if ( silminState->fractionateSol && !silminState->fractionateFlu && !strcmp((char *) solids[j].label, "fluid")) continue;
+                if (!silminState->fractionateSol &&  silminState->fractionateFlu &&  strcmp((char *) solids[j].label, "fluid")) continue;
 
                 for (ns=0; ns<(silminState->nFracCoexist)[j]; ns++) {
                     double oxSum, mass, gibbsEnergy, enthalpy, entropy, volume, heatCapacity;
@@ -1696,14 +1691,11 @@ int putSequenceDataToXmlFile(int active) {
         rc = sprintf(temporary, "%23.16e", previousSilminState->fracMass); rc = xmlTextWriterWriteFormatElement(writer, BAD_CAST "mass", "%s", temporary);
 
         if (previousSilminState->fractionateSol || previousSilminState->fractionateFlu) {
-            int haveWater = FALSE; // ((calculationMode == MODE__MELTS) || (calculationMode == MODE_pMELTS));
             for (j=0; j<npc; j++) {
                 int ns;
 
-                if ( haveWater &&  previousSilminState->fractionateSol && !previousSilminState->fractionateFlu && !strcmp((char *) solids[j].label, "water")) continue;
-                if ( haveWater && !previousSilminState->fractionateSol &&  previousSilminState->fractionateFlu &&  strcmp((char *) solids[j].label, "water")) continue;
-                if (!haveWater &&  previousSilminState->fractionateSol && !previousSilminState->fractionateFlu && !strcmp((char *) solids[j].label, "fluid")) continue;
-                if (!haveWater && !previousSilminState->fractionateSol &&  previousSilminState->fractionateFlu &&  strcmp((char *) solids[j].label, "fluid")) continue;
+                if ( previousSilminState->fractionateSol && !previousSilminState->fractionateFlu && !strcmp((char *) solids[j].label, "fluid")) continue;
+                if (!previousSilminState->fractionateSol &&  previousSilminState->fractionateFlu &&  strcmp((char *) solids[j].label, "fluid")) continue;
 
                 for (ns=0; ns<(previousSilminState->nFracCoexist)[j]; ns++) {
                     double oxSum, mass, gibbsEnergy, enthalpy, entropy, volume, heatCapacity;

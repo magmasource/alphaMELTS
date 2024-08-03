@@ -19,9 +19,9 @@
 #include "silmin.h"                /* SILMIN structures include file        */
 #include "interface.h"
 
-#include "adiabat.h"
+//#include "adiabat.h"
 #include "alphamelts.h"
-#include "phmelts.h"
+//#include "phmelts.h"
 
 #define FREE(x) free(x); x = NULL
 
@@ -236,7 +236,7 @@ int menu_option8(int index, int jphase, int incSolids, int fracSolids, int minTy
         if (incSolids > 0) {
             for (i=0, np=0; i<npc; i++) if (solids[i].type == PHASE) {
                 int len = strlen(solids[i].label);
-                if (strncmp(solids[i].label, "water", MIN(len, 5)) && strncmp(solids[i].label, "fluid", MIN(len, 5))) {
+                if (strncmp(solids[i].label, "fluid", MIN(len, 5))) {
                     if (solids[i].inStdSet)
                         (silminState->incSolids)[np] = MIN(incSolids, solids[i].na);
                     else
@@ -248,7 +248,7 @@ int menu_option8(int index, int jphase, int incSolids, int fracSolids, int minTy
         else if (incSolids == -1) { /* unlimited */
             for (i=0, np=0; i<npc; i++) if (solids[i].type == PHASE) {
                 int len = strlen(solids[i].label);
-                if (strncmp(solids[i].label, "water", MIN(len, 5)) && strncmp(solids[i].label, "fluid", MIN(len, 5))) {
+                if (strncmp(solids[i].label, "fluid", MIN(len, 5))) {
                     if (solids[i].inStdSet)
                         (silminState->incSolids)[np] = solids[i].na;
                     else
@@ -260,7 +260,7 @@ int menu_option8(int index, int jphase, int incSolids, int fracSolids, int minTy
         else if (!incSolids) {
             for (i=0, np=0; i<npc; i++) if (solids[i].type == PHASE) {
                 int len = strlen(solids[i].label);
-                if (strncmp(solids[i].label, "water", MIN(len, 5)) && strncmp(solids[i].label, "fluid", MIN(len, 5))) {
+                if (strncmp(solids[i].label, "fluid", MIN(len, 5))) {
                     (silminState->incSolids)[np] = FALSE; np++;
                 }
             }
@@ -276,7 +276,7 @@ int menu_option8(int index, int jphase, int incSolids, int fracSolids, int minTy
                 if (newMin > 0.0) silminState->fracOut = newMin;
                 for (i = 0; i<npc; i++) if (solids[i].type == PHASE) {
                     int len = strlen(solids[i].label);
-                    if (strncmp(solids[i].label, "water", MIN(len, 5)) && strncmp(solids[i].label, "fluid", MIN(len, 5))) {
+                    if (strncmp(solids[i].label, "fluid", MIN(len, 5))) {
                         silminState->fracSolids[i] = newMin;
                     }
                 }
@@ -289,7 +289,7 @@ int menu_option8(int index, int jphase, int incSolids, int fracSolids, int minTy
                 silminState->fracOut = 1.0;
                 for (i = 0; i<npc; i++) if (solids[i].type == PHASE) {
                     int len = strlen(solids[i].label);
-                    if (strncmp(solids[i].label, "water", MIN(len, 5)) && strncmp(solids[i].label, "fluid", MIN(len, 5))) {
+                    if (strncmp(solids[i].label, "fluid", MIN(len, 5))) {
                         silminState->fracSolids[i] = 1.0;
                     }
                 }

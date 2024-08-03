@@ -12,8 +12,9 @@
 
 #include "interface.h"
 #include "silmin.h"                /* SILMIN structures include file        */
-
 #include "status.h"
+
+#include "adiabat.h"
 
 #ifdef DEBUG
 #undef DEBUG
@@ -197,6 +198,168 @@ int adiabatFunc() {
 
 }
 
+void startingSolution() {
+
+    int i,j,k, hasLiquid = (silminState->liquidMass != 0.0);    /* counting indices */
+    //char phasename[40] = "startvalue";
+
+    if (!pdaNorm()) {
+        printf("Error in initial guess routine -- using superliquidus start\n");
+        /*equilibriumGuess = TRUE;*/
+        silminState->incLiquids = 1;
+        for (i=0;i<npc;i++) {
+            for (j=0;j<silminState->nSolidCoexist[i];j++) {
+                silminState->solidComp[i][j] = 0.0;
+                if (solids[i].na > 1) {
+                    for (k=0;k<solids[i].na;k++) silminState->solidComp[i+1+k][j] = 0.0;
+                }
+            }
+            silminState->nSolidCoexist[i] = 0;
+        }
+
+        printf("Unbuffered initial guess at: P %f, T %f\n", (silminState->P), silminState->dspTstart);
+        printPhases();
+        return;
+
+    }
+
+    /* set liquid components to zero */
+    if (hasLiquid) {
+        for (j=1; j<silminState->nLiquidCoexist; j++) {
+            free((silminState->liquidComp )[j]); (silminState->liquidComp )[j] = NULL;
+            free((silminState->liquidDelta)[j]); (silminState->liquidDelta)[j] = NULL;
+        }
+        for (i=0;i<nlc;i++) silminState->liquidComp[0][i] = 0.0;
+        //for (i=0;i<nc;i++)  silminState->dspLiquidComp[i] = 0.0;
+        silminState->nLiquidCoexist = 1; // else memory leak
+        silminState->liquidMass = 0.0;
+        hasLiquid = FALSE;
+    }
+
+    printf("Norm calculated initial guess at: P %f, T %f\n", (silminState->P), silminState->dspTstart);
+    printPhases();
+
+    if((silminState->fo2Path != FO2_NONE) && !silminState->fo2Liq) {
+
+        int fo2path = silminState->fo2Path, isentropic = silminState->isentropic,
+            isenthalpic = silminState->isenthalpic, isochoric = silminState->isochoric;
+        double fo2delta = silminState->fo2Delta;
+
+        silminState->fo2Path = FO2_NONE;
+        silminState->fo2Delta = 0.0;
+        if(isentropic) silminState->isentropic = FALSE; /* this was in case ALPHAMELTS_IMPOSE_FO2 */
+        else if (isenthalpic) silminState->isenthalpic = FALSE;
+        else if (isochoric) silminState->isochoric = FALSE;
+
+        if(!silmin()) {
+            printf("Error in initial guess routine -- using superliquidus start\n");
+
+            silminState->incLiquids = 1;
+            for (i=0;i<npc;i++) {
+                for (j=0;j<silminState->nSolidCoexist[i];j++) {
+                    silminState->solidComp[i][j] = 0.0;
+                    if (solids[i].na > 1) {
+                        for (k=0;k<solids[i].na;k++) silminState->solidComp[i+1+k][j] = 0.0;
+                    }
+                }
+                silminState->nSolidCoexist[i] = 0;
+            }
+                    silminState->solidMass = 0;
+            for (i=0; i<nlc; i++) {
+                (silminState->liquidComp)[0][i] = 0.0;
+                for (j=0; j<nc; j++) (silminState->liquidComp)[0][i] +=
+                               (silminState->bulkComp)[j]*(bulkSystem[j].oxToLiq)[i];
+            }
+            /*for (j=0; j<nc; j++)
+                (silminState->dspLiquidComp)[j] = (silminState->bulkComp)[j]*bulkSystem[j].mw;*/
+            silminState->nLiquidCoexist = 1;
+            silminState->liquidMass = silminState->refMass;
+            silminState->liquidMass = silminState->solidMass;
+            silminState->solidMass = 0;
+        }
+        silminState->fo2Path = fo2path;
+        silminState->fo2Delta = fo2delta;
+        if(isentropic) silminState->isentropic = TRUE;
+        else if (isenthalpic) silminState->isenthalpic = TRUE;
+        else if (isochoric) silminState->isochoric = TRUE;
+
+        printf("Unbuffered initial guess at: P %f, T %f\n", (silminState->P), silminState->dspTstart);
+        printPhases();
+    }
+
+}
+
+/* print out phase compositions */
+void printPhases(void) {
+    int i, j, k, width, hasLiquid = (silminState->liquidMass != 0.0);
+    double *mm, *r, mass, *dspLiquidComp;
+    char *formula;
+
+    if (outsw == (int *) NULL) setoutput();
+
+    if (hasLiquid) {
+        for (k=0;k<silminState->nLiquidCoexist;k++) {
+            dspLiquidComp = (double *) calloc(nlc, sizeof(double));
+            //    for (i=0,mass=0.0;i<nlc;i++) mass += silminState->liquidComp[k][i]*liquid[i].mw;
+            for (i=0,mass=0.0;i<nc;i++) {
+                for (j=0, dspLiquidComp[i]=0.0; j<nlc; j++) {
+                    dspLiquidComp[i] += silminState->liquidComp[k][j]*(liquid[j].liqToOx)[i]*bulkSystem[i].mw;
+                }
+                mass += dspLiquidComp[i];
+            }
+            for (i=0; i<nc; i++) if (outsw[i]) dspLiquidComp[i] *= ((mass != 0.0) ? 100.0/mass : 0);
+
+            /* Just print once for multiple liquids */
+            printf("liquid:   ");
+            for (i=0; i<nc; i++) if (outsw[i]) {
+                width = MAX(outsw[i], ((dspLiquidComp[i] >= 10.0) ?  floor(log10(dspLiquidComp[i])) + 4 : 4));
+                printf("%*.*s ", width, width, bulkSystem[i].label); /* SO3, Cl2O-1, F2O-1 */
+            }
+            width = 5 - ((mass >= 10.0) ? floor(log10(mass)) : 0);
+            printf("\n%7.*f g ", width, mass);
+            //for (i=0;i<nc;i++) if (outsw[i]) printf("%.2f ", silminState->dspLiquidComp[k][i]);
+            for (i=0; i<nc; i++) if (outsw[i]) {
+                width = MAX(outsw[i], ((dspLiquidComp[i] >= 10.0) ?  floor(log10(dspLiquidComp[i])) + 4 : 4));
+                printf("%*.2f ", width, dspLiquidComp[i]); /* SO3, Cl2O-1, F2O-1 */
+            }
+            printf("\n");
+            printf("Activity of H2O = %g  Melt fraction = %g\n", silminState->aH2O,
+            silminState->liquidMass/(silminState->liquidMass + silminState->solidMass));
+            free(dspLiquidComp);
+        }
+    }
+
+    for (i=0;i<npc;i++) {
+        for (j=0;j<(silminState->nSolidCoexist)[i];j++) {
+            if (solids[i].na == 1)
+                printf("%s: %f g, composition %s\n", solids[i].label,
+                    (silminState->solidComp)[i][j]*solids[i].mw, solids[i].formula);
+            else {
+                mm = (double *) calloc(solids[i].na, sizeof(double));
+                r = (double *) calloc(solids[i].na, sizeof(double));
+                for (k=0, mass=0.0; k<solids[i].na; k++) {
+                    mm[k] = (silminState->solidComp)[i+1+k][j];
+                    mass += (silminState->solidComp)[i+1+k][j]*solids[i+1+k].mw;
+                }
+                (*solids[i].convert)(SECOND, THIRD, silminState->T, silminState->P,
+                    (double *) NULL, mm, r, (double *) NULL, (double **) NULL,
+                    (double ***) NULL, (double **) NULL, (double ****) NULL);
+                (*solids[i].display)(FIRST, silminState->T, silminState->P,
+                    r, &formula);
+                for (k=0; strlen(formula); k++) {
+                    if (formula[k] != ' ') break;
+                }
+                printf("%s: %f g, composition %s\n", solids[i].label, mass, &formula[k]);
+                free(formula);
+                if (!(*solids[i].test)(SIXTH, silminState->T, silminState->P, 0, 0, (char **) NULL,
+                        (char **) NULL, (double *) NULL, mm))
+                        printf("Phase %s is infeasible\n", solids[i].label);
+                free(mm); free(r);
+            }
+        }
+    }
+
+}
 
 /* This is getLiquidProperties in create_managed.c, modified to be passed a state */
 /* Note: returned volume is in cc */

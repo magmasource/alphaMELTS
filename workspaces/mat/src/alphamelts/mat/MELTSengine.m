@@ -621,7 +621,10 @@ classdef MELTSengine < matlab.mixin.SetGet & matlab.mixin.Copyable
         end
 
         function calcViscosityFromGRD(obj, phaseList, varargin)
-            % 'Supplemental Calculator' type calculation to get viscosity of one or more liquids. If composition(s) not passed, will use the contents of phaseComposition (grams).
+            % 'Supplemental Calculator' type calculation to get viscosity of one or more liquids using:
+            % Giordano D, Russell JK, Dingwell DB (2008) Viscosity of magmatic liquids: A model. EPSL 271, 123-134.
+            % If composition(s) not passed, will use the contents of phaseComposition (grams).
+            % Call this after calcPhaseProperties or calcMolarProperties to avoid the GRD viscosity being overwritten.
             % System ('bulk') viscosity is not updated by this method; it always uses Shaw model and crystallinity.
             if obj.calculationMode ~= obj.status.getCalculationMode
                 success = obj.status.setCalculationMode(obj.calculationMode);

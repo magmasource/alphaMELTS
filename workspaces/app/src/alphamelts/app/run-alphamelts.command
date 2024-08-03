@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# run-alphamelts.command 2.3.0
+# run-alphamelts.command 2.3
 use strict;
 
 my (@argv2, $in_file, $settings_file, $melts_file, $log_file, $batch_file, $new_file, $old_file, $out_file, $column_file, $table_file, $table_row);

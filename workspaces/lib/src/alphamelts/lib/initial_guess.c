@@ -40,7 +40,7 @@ int pdaNorm() {
             else if (!strcmp(solids[i].label, "plagioclase"))   plindex = i;
             else if (!strcmp(solids[i].label, "quartz"))        qindex = i;
             else if (!strcmp(solids[i].label, "whitlockite"))   whitindex = i;
-            else if (!strcmp(solids[i].label, "water") || !strcmp(solids[i].label, "fluid")) windex = i;
+            else if (!strcmp(solids[i].label, "fluid"))         windex = i;
             /* need to zero all other phases in case a hydrous phase is already present */
             else if (silminState->nSolidCoexist[i]) silminState->nSolidCoexist[i] = 0;
 

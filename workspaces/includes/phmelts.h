@@ -5,6 +5,8 @@
 #ifndef _pHMELTS_H
 #define _pHMELTS_H
 
+#define THIS_VERSION 2.0301
+
 void initializeLibrary();
 int setCalculationMode(int mode);
 SilminState *createSilminState(void);

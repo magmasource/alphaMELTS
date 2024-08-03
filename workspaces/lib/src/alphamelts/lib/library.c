@@ -30,8 +30,9 @@ char *addOutputFileName = NULL;
 #define XOR(a,b) ((a) ? !(b) : (b))
 #define REC   134
 
-#define DATESTAMP " (" __DATE__ " " __TIME__ ")"
-static double thisversion = 1.0201; static char *filestatus = DATESTAMP;
+#define DATESTAMP "beta (" __DATE__ " " __TIME__ ")"
+/*static double thisversion = 1.0300;*/
+static double thisversion = THIS_VERSION; static char *filestatus = DATESTAMP;
 
 /* For SEH this is used to indicate whether the calculation failed. */
 int doInterrupt = FALSE;
