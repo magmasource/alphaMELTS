@@ -1,4 +1,7 @@
-# alphaMELTS
+# alphaMELTS@CIT
+
+<img src="https://raw.githubusercontent.com/magmasource/alphaMELTS/main/docs/logo_final%20ellipse.png" alt="New alphaMELTS Logo" width="40%" align="right">
+
 [![DOI](https://zenodo.org/badge/724791740.svg)](https://zenodo.org/doi/10.5281/zenodo.11406234)
 
 alphaMELTS started as a text menu-driven interface to subroutine versions of the MELTS ([Ghiorso & Sack, 1995](http://dx.doi.org/10.1007/s004100050036)), pMELTS ([Ghiorso et al., 2002](http://dx.doi.org/10.1029/2001GC000217)), and pHMELTS ([Asimow et al., 2004](http://dx.doi.org/10.1029/2003GC000568)) models of thermodynamic equilibrium in silicate systems. Formerly known as 'Adiabat_1ph', and described in a software brief in G-cubed ([Smith & Asimow, 2005](http://dx.doi.org/10.1029/2004GC000816)), it evolved to 'alphaMELTS' via Adiabat_1ph &rarr; A1ph &rarr; Alph &rarr; alpha &rarr; alphaMELTS.
