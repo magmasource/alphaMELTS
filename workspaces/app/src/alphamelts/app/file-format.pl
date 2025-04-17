@@ -22,7 +22,7 @@ until (@argv2) {
     }
     else {
 
-	print ("Usage: file-format.command list_of_files\n");
+	print ("Usage: file-format.pl list_of_files\n");
 	print ("Please enter list of files (separated by spaces) now.\n");
 
 	$_ = <STDIN>;

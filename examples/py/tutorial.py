@@ -102,7 +102,7 @@ while ptpath.engine.temperature >= 1000:
 
 # %%
 # Get the Phase_mass_tbl.txt and Phase_vol_tbl.txt files if standalone alphaMELTS 2 is installed
-# !run-alphamelts.command -x
+# !run-alphamelts.pl -x
 
 # %%
 temp = ptpath.getListProperty('temperature')

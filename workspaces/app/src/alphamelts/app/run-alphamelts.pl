@@ -1,9 +1,10 @@
 #!/usr/bin/perl -w
 
-# run-alphamelts.command 2.3
+# run-alphamelts.pl 2.3
 use strict;
 
-my (@argv2, $in_file, $settings_file, $melts_file, $log_file, $batch_file, $new_file, $old_file, $out_file, $column_file, $table_file, $table_row);
+my (@argv2, $in_file, $settings_file, $melts_file, $log_file, $batch_file,
+    $new_file, $old_file, $out_file, $column_file, $table_file, $table_row);
 my ($version, $newversion, $path, $run_path, $batch, $auto, $sets, %switch);
 my ($windows, $program, $rs, $run, $debug, $delim, $line, @lines, $title);
 
@@ -55,28 +56,43 @@ until (@argv2) {
     }
     $version =~ s/(\d\.)0*(\d+)/$1$2/;
 
+    #          01234567890123456789012345678901234567890123456789012345678901234567890123456789
+    #          This is run-alphamelts.pl X.X; use it with alphamelts X.X or updates X.X.X
     # -h prints the following help before quitting
     if (@argv2 && $argv2[0] eq '-h') {
-        warn ("\n usage: run-alphamelts\.command \n\n".
-              " [-h]                 print this brief help \n".
-              " [-f input_file]      general file for environment variables, alphamelts settings, alphamelts menu input etc. \n".
-              "                      (can be split into separate input_file, settings_file, and batch_file with -s, and -b or -a) \n".
-              " [-m melts_file]      .melts format file to use as template for compositions etc. \n".
-              " [-n file_name]       file name base to use for new melts_file(s) (default uses original file name) \n".
-              " [-t table_file]      table of compositions, P, T, and/or fO2 to be substituted into melts_file \n".
-              " [-s [settings_file]] (optional) separate file with alphamelts settings to be added to melts_file(s) \n".
-              "                      (if no file is specified will add lines to suppress certain phases for backwards compatibility) \n".
-              " [-b [batch_file]]    batch processing mode using alphamelts menu commands from input_file, or batch_file if specified \n".
-              " [-a [batch_file]]    same as '-b', except with '-t' the menu commands are automatically repeated for each new melts_file \n".
-              "                      (ALPHAMELTS_CALC_MODE must be set to MELTS, MELTSandCO2, MELTSandCO2_H2O, or pMELTS in input_file) \n".
-              " [-p output_path]     path of directory for output files (if not the same as working directory) \n".
-              " [-l log_file]        name of additional file to record environment, settings, and menu input (default logfile.txt) \n".
-              " [-c column_file]     run 'column-pick.command column_file' for each file in column_files before moving files \n".
-              " [-o output_file]     filename for output of column-pick.command (default alphaMELTS_tbl.txt) \n".
-              " [-d]                 debug calculation issues by printing more program output to screen \n".
-              " [-x]                 process input files as usual but do not start the alphamelts executable \n".
-              "                      (or use with '-p' or '-c' to move or run column-pick on previously generated output files) \n\n".
-              " This is run-alphamelts.command $version; use it with alphamelts $version or updates $version.X.\n\n");
+        warn ("\n usage: run-alphamelts\.pl                                                      \n".
+              "\n [-h]                 print this brief help                                     \n".
+              " [-f input_file]      general file for environment variables, settings and menu \n".
+              "                      input for alphamelts (can use -s, and -b or -a to split   \n".
+              "                      into separate input_file, settings_file and/or batch_file)\n".
+              " [-m melts_file]      .melts format template file to use for compositions etc.  \n".
+              " [-n file_name]       file name base to use for new melts_file(s) (default uses \n".
+              "                      original file name from the melts_file template)          \n".
+              " [-t table_file]      table of compositions, P, T, and/or fO2 to be substituted \n".
+              "                      into the melts_file template                              \n".
+              " [-s [settings_file]] (optional) separate file with alphamelts settings to add  \n".
+              "                      to melts_file(s) (if no file is specified will add lines  \n".
+              "                      to suppress certain phases for backwards compatibility)   \n".
+              " [-b [batch_file]]    batch processing mode using alphamelts menu commands from \n".
+              "                      input_file, or batch_file if specified                    \n".
+              " [-a [batch_file]]    same as '-b', except with '-t' the menu commands are      \n".
+              "                      automatically repeated for each new melts_file            \n".
+              "                      (ALPHAMELTS_CALC_MODE must be set to MELTS, MELTSandCO2,  \n".
+              "                      MELTSandCO2_H2O, or pMELTS in input_file)                 \n".
+              " [-p output_path]     path of directory for output files (if not the same as    \n".
+              "                      working directory)                                        \n".
+              " [-l log_file]        name of additional file to record environment, settings   \n".
+              "                      and menu input (default logfile.txt)                      \n".
+              " [-c column_file]     run 'column-pick.pl filename' for each filename listed in \n".
+              "                      column_file before moving the output files to output_path \n".
+              " [-o output_file]     filename for output of column-pick.pl (default output is  \n".
+              "                      alphaMELTS_tbl.txt)                                       \n".
+              " [-d]                 debug calculation issues by printing more program output  \n".
+              "                      to screen                                                 \n".
+              " [-x]                 process input files as usual but do not run the alphamelts\n".
+              "                      executable (or use with '-p' or '-c' to move or run       \n".
+              "                      column-pick on previously generated output files)         \n".
+              "\n This is run-alphamelts.pl $version; use it with alphamelts $version or updates $version.X.\n\n");
         next;
     }
     elsif ($newversion) {
@@ -85,7 +101,7 @@ until (@argv2) {
 
     $path = $batch = '';
     $run_path = $0; # $0 is the name (and path) of the run-alphamelts script (not the .bat)
-    $run_path =~ s/run-alphamelts.command//;
+    $run_path =~ s/run-alphamelts.pl//;
     $run = '';
     $program = 'alphamelts2';
 
@@ -127,7 +143,8 @@ until (@argv2) {
         $debug = '' if (grep /^-[dgv]$/, @argv2);
         print "Process ID = $$\n" unless $debug;
         $run = 'gdb ' if (grep /^-g$/, @argv2);
-        $run = 'valgrind --leak-check=full --show-leak-kinds=definite,possible --track-origins=yes --expensive-definedness-checks=yes ' if (grep /^-v/, @argv2);
+        $run = 'valgrind --leak-check=full --show-leak-kinds=definite,possible'.
+            '--track-origins=yes --expensive-definedness-checks=yes ' if (grep /^-v/, @argv2);
 
         $auto = grep /^-a/, @argv2;
         $batch = grep /^-b/, @argv2;
@@ -146,18 +163,18 @@ until (@argv2) {
         $out_file = $switch{'-o'}  if exists $switch{'-o'};
 
         if ((grep /^-[^hfmstnaboplcdxgv]$/, @argv2) || (grep /^-..+$/, @argv2)) {
-            grep {warn "RUN-ALPHAMELTS.COMMAND ERROR: Unknown option \'$_\'\n" if $_ =~ /^-[^hfmstnaboplcdxgv]$/} @argv2;
-            grep {warn "RUN-ALPHAMELTS.COMMAND ERROR: Unknown option \'$_\'\n" if $_ =~ /^-..+$/} @argv2;
+            grep {warn "RUN-ALPHAMELTS.PL ERROR: Unknown option \'$_\'\n" if $_ =~ /^-[^hfmstnaboplcdxgv]$/} @argv2;
+            grep {warn "RUN-ALPHAMELTS.PL ERROR: Unknown option \'$_\'\n" if $_ =~ /^-..+$/} @argv2;
             next;
         }
         if (exists $switch{'-d'} || exists $switch{'-g'} || exists $switch{'-v'}) {
-            grep {warn "RUN-ALPHAMELTS.COMMAND ERROR: Unknown option \'$_ $switch{$_}\'\n" if exists $switch{$_}} ('-d', '-g', '-v');
+            grep {warn "RUN-ALPHAMELTS.PL ERROR: Unknown option \'$_ $switch{$_}\'\n" if exists $switch{$_}} ('-d', '-g', '-v');
             next;
         }
 
     }
     elsif (@argv2) {
-        grep {warn "RUN-ALPHAMELTS.COMMAND ERROR: Unknown option \'$_\'\n"} @argv2;
+        grep {warn "RUN-ALPHAMELTS.PL ERROR: Unknown option \'$_\'\n"} @argv2;
         next;
     }
     else {
@@ -167,16 +184,16 @@ until (@argv2) {
     if ($program) {
         unless (open (LOGFILE, '>', 'logfile.txt')) {
             my $temp = ($log_file) ? ' temporary' : '';
-            warn "RUN-ALPHAMELTS.COMMAND WARNING: Cannot open (temporary) log_file logfile.txt on 1st try ($!)\n";
+            warn "RUN-ALPHAMELTS.PL WARNING: Cannot open (temporary) log_file logfile.txt on 1st try ($!)\n";
             unless ((chdir "$run_path") && (open (LOGFILE, '>', 'logfile.txt'))) {
-                warn "RUN-ALPHAMELTS.COMMAND WARNING: Cannot open (temporary) log_file logfile.txt on 2nd try ($!)\n";
+                warn "RUN-ALPHAMELTS.PL WARNING: Cannot open (temporary) log_file logfile.txt on 2nd try ($!)\n";
                 next;
             }
         }
     }
     if ($in_file) {
         unless (open (INPUT, '<', "$in_file")) {
-            warn "RUN-ALPHAMELTS.COMMAND ERROR: Cannot open input_file \"$in_file\" ($!)\n";
+            warn "RUN-ALPHAMELTS.PL ERROR: Cannot open input_file \"$in_file\" ($!)\n";
             next;
         }
 
@@ -208,7 +225,7 @@ until (@argv2) {
 
     if ($settings_file) {
         unless (open (INPUT, '<', "$settings_file")) {
-            warn "RUN-ALPHAMELTS.COMMAND ERROR: Cannot open settings_file \"$settings_file\" ($!)\n";
+            warn "RUN-ALPHAMELTS.PL ERROR: Cannot open settings_file \"$settings_file\" ($!)\n";
             next;
         }
 
@@ -236,7 +253,7 @@ until (@argv2) {
     if($melts_file) {
 
         unless (open (OLDMELTS, '<', "$melts_file")) {
-            warn "RUN-ALPHAMELTS.COMMAND ERROR: Cannot open melts_file \"$melts_file\" ($!)\n";
+            warn "RUN-ALPHAMELTS.PL ERROR: Cannot open melts_file \"$melts_file\" ($!)\n";
             next;
         }
 
@@ -254,12 +271,12 @@ until (@argv2) {
         }
         else {
             unless (rename $melts_file, "$melts_file\_bak") {
-                warn "RUN-ALPHAMELTS.COMMAND ERROR: Cannot rename melts_file \"$melts_file\" ($!)\n";
+                warn "RUN-ALPHAMELTS.PL ERROR: Cannot rename melts_file \"$melts_file\" ($!)\n";
                 next;
             }
         }
         unless (open (NEWMELTS, '>', "$melts_file")) {
-            warn "RUN-ALPHAMELTS.COMMAND ERROR: Cannot open melts_file \"$melts_file\" ($!)\n";
+            warn "RUN-ALPHAMELTS.PL ERROR: Cannot open melts_file \"$melts_file\" ($!)\n";
             next;
         }
 
@@ -286,7 +303,8 @@ until (@argv2) {
                 push @newlines, $line unless grep {s/$_/$line/i if $_ =~ (split /\s+/, $line)[1]} @newlines;
             }
             else {
-                # substitute old line in melts file for new line from input file or add new line if not previously set in melts file
+                # substitute old line in melts file for new line from input file
+                # or add new line if not previously set in melts file
                 push @newlines, $line unless grep {s/$_/$line/i if $_ =~ (split /\:/, $line)[0]} @newlines;
             }
         } @lines;
@@ -298,7 +316,7 @@ until (@argv2) {
         if($table_file) {
 
             unless (open (TABLE, '<', "$table_file")) {
-                warn "RUN-ALPHAMELTS.COMMAND ERROR: Cannot open table_file \"$table_file\" ($!)\n";
+                warn "RUN-ALPHAMELTS.PL ERROR: Cannot open table_file \"$table_file\" ($!)\n";
                 next;
             }
 
@@ -364,14 +382,14 @@ until (@argv2) {
         @newlines = ();
     }
     elsif ($table_file || $settings_file) {
-        warn "RUN-ALPHAMELTS.COMMAND ERROR: Please provide a melts_file to use as template for the table_file\n" if $table_file;
-        warn "RUN-ALPHAMELTS.COMMAND ERROR: Please provide a melts_file to use as template for the settings_file\n" if $settings_file;
+        warn "RUN-ALPHAMELTS.PL ERROR: Please provide a melts_file to use as template for the table_file\n" if $table_file;
+        warn "RUN-ALPHAMELTS.PL ERROR: Please provide a melts_file to use as template for the settings_file\n" if $settings_file;
         next;
     }
     @lines = ();
 
     if ($program && $auto && !exists $ENV{'ALPHAMELTS_CALC_MODE'}) {
-        warn "RUN-ALPHAMELTS.COMMAND ERROR: Please put ALPHAMELTS_CALC_MODE in input_file to run in automatic mode \n";
+        warn "RUN-ALPHAMELTS.PL ERROR: Please put ALPHAMELTS_CALC_MODE in input_file to run in automatic mode \n";
         next;
     }
     if ($auto || $batch) {
@@ -384,11 +402,11 @@ until (@argv2) {
             $new_file = "auto_batch.txt";
 
             unless (open (BATCH, '>', "$new_file")) {
-                warn "RUN-ALPHAMELTS.COMMAND ERROR: Cannot open batch_file \"$new_file\" ($!)\n";
+                warn "RUN-ALPHAMELTS.PL ERROR: Cannot open batch_file \"$new_file\" ($!)\n";
                 next;
             }
             unless (open (OLDFILE, '<', "$old_file")) {
-                warn "RUN-ALPHAMELTS.COMMAND ERROR: Cannot open batch_file \"$old_file\" ($!)\n";
+                warn "RUN-ALPHAMELTS.PL ERROR: Cannot open batch_file \"$old_file\" ($!)\n";
                 next;
             }
 
@@ -430,7 +448,7 @@ until (@argv2) {
 
         }
         else {
-            warn "RUN-ALPHAMELTS.COMMAND ERROR: Please provide a batch_file (or input_file) to run in automatic mode\n";
+            warn "RUN-ALPHAMELTS.PL ERROR: Please provide a batch_file (or input_file) to run in automatic mode\n";
             next;
         }
     }
@@ -473,7 +491,7 @@ until (@argv2) {
             ((-f "$run_path$program") && !(system "$run\"$run_path$program\" 1 $debug < auto_batch.txt")) ||
                 ((-f "$run_path$program.bat") && !(system "$run\"$run_path$program\" 1 $debug < auto_batch.txt")) ||
                 (!(-f "$run_path$program") && !(system "$run$program 1 $debug < auto_batch.txt")) ||
-                warn "RUN-ALPHAMELTS.COMMAND WARNING: alphamelts may have crashed!\n";
+                warn "RUN-ALPHAMELTS.PL WARNING: alphamelts may have crashed!\n";
 
         }
         else {
@@ -493,7 +511,7 @@ until (@argv2) {
             # Try $run_path first as can test for the file; then try path (e.g. for Mac double-click)
             ((-f "$run_path$program") && !(system "$run\"$run_path$program\" $debug")) ||
                 (!(-f "$run_path$program") && !(system "$run\"$program\" $debug")) ||
-                warn "RUN-ALPHAMELTS.COMMAND WARNING: alphamelts may have crashed!\n";
+                warn "RUN-ALPHAMELTS.PL WARNING: alphamelts may have crashed!\n";
 
         }
         print "\n\n";
@@ -506,7 +524,7 @@ until (@argv2) {
 
     # Test solids first so don't waste time processing old file
     unless (-f "Phase_main_tbl.txt") {
-        warn "RUN-ALPHAMELTS.COMMAND WARNING: Cannot find output file \"Phase_main_tbl.txt\" ($!)\n";
+        warn "RUN-ALPHAMELTS.PL WARNING: Cannot find output file \"Phase_main_tbl.txt\" ($!)\n";
         warn "Please check that alphamelts ran properly.\n";
         next;
     }
@@ -520,7 +538,7 @@ until (@argv2) {
         close (INPUT);
         unless (grep /(index\s+)(.+)(Pressure\s+)(.+)(Temperature.*)/, @lines) {
             # probably means the Solids file has already been processed
-            warn "RUN-ALPHAMELTS.COMMAND WARNING: Incorrect format in output file \"Phase_main_tbl.txt\".\n";
+            warn "RUN-ALPHAMELTS.PL WARNING: Incorrect format in output file \"Phase_main_tbl.txt\".\n";
             warn "File has already been processed? Please check that alphamelts ran properly.\n";
             next;
         }
@@ -531,7 +549,7 @@ until (@argv2) {
     # now start processing output; first check file exists
     unless ((-f $phase_file) && (rename $phase_file, "$phase_file\_bak") &&
             (open (INPUT, '<', "$phase_file\_bak")) && (open (TABLE, "+>$phase_file"))) {
-        warn "RUN-ALPHAMELTS.COMMAND ERROR: Cannot open output file \"$phase_file\" ($!)\n";
+        warn "RUN-ALPHAMELTS.PL ERROR: Cannot open output file \"$phase_file\" ($!)\n";
         next;
     }
 
@@ -571,7 +589,7 @@ until (@argv2) {
             }
             else {
                 # probably means the Solids file has already been processed
-                warn "RUN-ALPHAMELTS.COMMAND WARNING: Incorrect format in output file \"$out_file\".\n";
+                warn "RUN-ALPHAMELTS.PL WARNING: Incorrect format in output file \"$out_file\".\n";
                 warn "File has already been processed? Please check that alphamelts ran properly.\n";
                 next;
             }
@@ -629,7 +647,7 @@ until (@argv2) {
     close TABLE;
 
     unless (open (COLFILE, '>', 'col_phase_mass.txt')) {
-        warn "RUN-ALPHAMELTS.COMMAND ERROR: Cannot open column_file \"col_phase_mass.txt\" ($!)\n";
+        warn "RUN-ALPHAMELTS.PL ERROR: Cannot open column_file \"col_phase_mass.txt\" ($!)\n";
         next;
     }
 
@@ -637,15 +655,15 @@ until (@argv2) {
 
     close COLFILE;
 
-    $program = 'column-pick.command';
+    $program = 'column-pick.pl';
     ((-f "$run_path$program") && !(system "$run\"$run_path$program\" col_phase_mass.txt $debug > Phase_mass_tbl.txt")) ||
         (!(-f "$run_path$program") && !(system "$run$program col_phase_mass.txt $debug > Phase_mass_tbl.txt")) ||
-        warn "RUN-ALPHAMELTS.COMMAND WARNING: column-pick.command may not have run properly!\n";
+        warn "RUN-ALPHAMELTS.PL WARNING: column-pick.pl may not have run properly!\n";
 
     map {s/col_phase_mass/col_phase_vol/; s/Masses/Volumes/; s/mass/V/g} @lines;
 
     unless (open (COLFILE, '>', 'col_phase_vol.txt')) {
-        warn "RUN-ALPHAMELTS.COMMAND ERROR: Cannot open column_file \"col_phase_vol.txt\" ($!)\n";
+        warn "RUN-ALPHAMELTS.PL ERROR: Cannot open column_file \"col_phase_vol.txt\" ($!)\n";
         next;
     }
 
@@ -655,7 +673,7 @@ until (@argv2) {
 
     ((-f "$run_path$program") && !(system "$run\"$run_path$program\" col_phase_vol.txt $debug > Phase_vol_tbl.txt")) ||
         (!(-f "$run_path$program") && !(system "$run$program col_phase_vol.txt $debug > Phase_vol_tbl.txt")) ||
-        warn "RUN-ALPHAMELTS.COMMAND WARNING: column-pick.command may not have run properly!\n";
+        warn "RUN-ALPHAMELTS.PL WARNING: column-pick.pl may not have run properly!\n";
 
 
 }
@@ -663,10 +681,10 @@ continue {
 
     # If forgot -c or -p switches don't have to rerun whole program - just choose menu option 'x'
     if ($column_file) {
-        $program = 'column-pick.command';
+        $program = 'column-pick.pl';
         ((-f "$run_path$program") && !(system "$run\"$run_path$program\" $column_file > $out_file")) ||
             (!(-f "$run_path$program") && !(system "$run$program $column_file")) ||
-            warn "RUN-ALPHAMELTS.COMMAND WARNING: column-pick.command may not have run properly!\n";
+            warn "RUN-ALPHAMELTS.PL WARNING: column-pick.pl may not have run properly!\n";
     }
 
     $program = ($windows) ? 'copy /Y' : 'cp -f'; # perl's copy requires a module to be installed

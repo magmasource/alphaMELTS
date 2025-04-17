@@ -11,10 +11,10 @@ This example uses an input file that has been modified from the [Morb.melts](htt
 
 A version of the modified Morb.melts is included here. Note that this file is identical to the one linked above, except that it has Windows file endings, but the [morb.melts](https://melts.ofm-research.org/Macosx/morb.melts) version linked on the [Mac OS X download site](https://melts.ofm-research.org/macosx.html) differs slightly in Cr~2~O~3~ content and in the *P-T* conditions.
 
-Assuming alphaMELTS is correctly installed, open Terminal (on Mac), cmd.exe (on native Windows), the WSL or similar. Navigate to the tutorial folder by typing 'cd MELTS/tutorial'. alphaMELTS is started by typing 'run-alphamelts.command' (note the dash, '-'; 'run_alphamelts.command' with an underscore, '_',  is for alphaMELTS 1.X). The script will ask whether you would like to add some command line switches. Unlike alphaMELTS 1.X, the *settings_file* is optional in alphaMELTS 2+. For now we won't use one, so just press return for the default settings.
+Assuming alphaMELTS is correctly installed, open Terminal (on Mac), cmd.exe (on native Windows), the WSL or similar. Navigate to the tutorial folder by typing 'cd MELTS/tutorial'. alphaMELTS is started by typing 'run-alphamelts.pl' (note the dash, '-'; 'run_alphamelts.pl' with an underscore, '_',  is for alphaMELTS 1.X). The script will ask whether you would like to add some command line switches. Unlike alphaMELTS 1.X, the *settings_file* is optional in alphaMELTS 2+. For now we won't use one, so just press return for the default settings.
 
 ```
-Mac:tutorial psmith$ run-alphamelts.command
+Mac:tutorial psmith$ run-alphamelts.pl
 No command line switches specified! Please enter switches now (or press return for defaults).
 ```
 
@@ -65,7 +65,7 @@ MELTS filename: Morb.melts
 Input file read. Waiting for command or user input.
 ```
 
-In alphaMELTS 1.X, some lines of Morb.melts were ignored so only those lines that were used were echoed back. alphaMELTS 2+ uses all lines in Morb.melts, so it does not print them unless there is a problem (or you use the '-d' command switch with run-alphamelts.command). Although the front-end program looks very different to the one in the [original tutorial](https://melts.ofm-research.org/Manual/UnixManHtml/examples-test.html), the settings for the underlying MELTS algorithm are now exactly the same as described in the 'Four things have been accomplished:' list there. You can verify that the initial pressure and temperature are set correctly with option 2:
+In alphaMELTS 1.X, some lines of Morb.melts were ignored so only those lines that were used were echoed back. alphaMELTS 2+ uses all lines in Morb.melts, so it does not print them unless there is a problem (or you use the '-d' command switch with run-alphamelts.pl). Although the front-end program looks very different to the one in the [original tutorial](https://melts.ofm-research.org/Manual/UnixManHtml/examples-test.html), the settings for the underlying MELTS algorithm are now exactly the same as described in the 'Four things have been accomplished:' list there. You can verify that the initial pressure and temperature are set correctly with option 2:
 
 ```
 Your choice: 2
@@ -145,7 +145,7 @@ Successful return from alphamelts...
 alphaMELTS main menu (enter 'x' when done):
 ```
 
-Once it has finished executing, choose option 0 to quit (as opposed to shutting the terminal window). You should find 7 new text files have been generated, which are described in the alphaMELTS 1.X documentation. (Note that in alphaMELTS 2 the 'Phase_mass_tbl.txt' and 'Phase_vol_table.txt' files are generated after the run by the run-alphamelts.command script.)
+Once it has finished executing, choose option 0 to quit (as opposed to shutting the terminal window). You should find 7 new text files have been generated, which are described in the alphaMELTS 1.X documentation. (Note that in alphaMELTS 2 the 'Phase_mass_tbl.txt' and 'Phase_vol_table.txt' files are generated after the run by the run-alphamelts.pl script.)
 
 alphaMELTS 2 has another optional line for the *melts_file* that can take one of four values:
 

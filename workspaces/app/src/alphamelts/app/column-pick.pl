@@ -47,7 +47,7 @@ until ($outfile && !$infile) {
 	    $_ = <INFILE>;
 	}
 	else {
-	    print ("Usage: column_pick.command column_list_files > table_file\n");
+	    print ("Usage: column_pick.pl column_list_files > table_file\n");
 	    print ("Please enter column_list_files, separated by spaces, and / or\n");
 	    print ("type '>' and the table_file name to finish and write output.\n");
 	    print ("First processed table must have an entry for each recorded step.\n");
@@ -419,7 +419,7 @@ until ($outfile && !$infile) {
 
 	# With incorrect line endings the whole file may be one long line
 	if ($. < 3) {
-	    ($outfile eq '>') || warn ("Please run file-format.command on \"$colfile\" and try again!\n");
+	    ($outfile eq '>') || warn ("Please run file-format.pl on \"$colfile\" and try again!\n");
 	    last FOREACH;
 	}
 	close COLUMNLIST;
@@ -428,7 +428,7 @@ until ($outfile && !$infile) {
 
 }
 
-# Put the header in if coming from run-alphamelts.command
+# Put the header in if coming from run-alphamelts.pl
 $lines[0] = ($header eq 'excel') ? $lines[0] : $header;
 # Remove extra header line in matlab version
 shift @lines if ($header eq 'matlab');
