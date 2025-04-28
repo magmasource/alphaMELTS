@@ -148,14 +148,14 @@ MELTS Source Code: RCS
 
 static double **matrix_alloc(int n1, int n2) {
     int i;
+    double *m0 = (double *) malloc((size_t) n1*n2*sizeof(double));
     double **m = (double **) malloc((size_t) n1*sizeof(double *));
-    for (i=0; i<n1; i++) m[i] = (double *) malloc((size_t) n2*sizeof(double));
+    for (i=0; i<n1; i++) m[i] = &m0[i*n2];
     return m;
 }
 
 static void matrix_free(double **m, int n1, int n2) {
-    int i;
-    for (i=0; i<n1; i++) free(m[i]);
+    free(m[0]);
     free(m);
 }
 
@@ -293,8 +293,8 @@ int subsolidusmuO2(int mask,
             stMatrix = matrix_alloc(mm, n);
             dstoich  = vector_alloc(n);
 
-            for (j=1, stMatrix[0][0]=1.0; j<n; j++) stMatrix[0][j]=0.0;
-            for (i=1; i<mm; i++) stMatrix[i][0]=0.0;
+            for (j=1, stMatrix[0][0]=1.0; j<n; j++) stMatrix[0][j] = 0.0;
+            for (i=1; i<mm; i++) stMatrix[i][0] = 0.0;
             for (i=1; i<mm; i++) for (j=0; j<n; j++) stMatrix[i][j] = solids[phaseIndex[j]].solToOx[oxide[i]];
 
             /* If FeO and Fe2O3 are both nonzero in the bulk composition,

@@ -2245,9 +2245,13 @@ order(int mask, double t, double p, double r[NR],
 
     if (mask & SEVENTH) {   /* compute d2s/drp */
         double *s = sOld;
-        double d2gdrds[NR][NS], d2gdsdp[NS], d3gdrds2[NR][NS][NS],
-            d3gdrdsdp[NR][NS], d3gds3[NS][NS][NS], d3gds2dp[NS][NS], dsdr[NS][NR],
-            dsdp[NS], temp[NS], temp2[NS];
+        double d2gdrds[NR][NS];
+        double d2gdsdp[NS];
+        double d3gdrds2[NR][NS][NS];
+        double d3gdrdsdp[NR][NS];
+        double d3gds3[NS][NS][NS];
+        double d3gds2dp[NS][NS];
+        double dsdr[NS][NR], dsdp[NS], temp[NS], temp2[NS];
         gsl_matrix_view mvToDsdr = gsl_matrix_view_array((double *) dsdr, (size_t) NS, (size_t) NR),
             mvToD2gdrds = gsl_matrix_view_array((double *) d2gdrds, (size_t) NR, (size_t) NS);
         gsl_vector_view vvToDsdp = gsl_vector_view_array(dsdp, (size_t) NS),
@@ -2391,8 +2395,11 @@ order(int mask, double t, double p, double r[NR],
     }
     if (mask & TENTH  ) {   /* compute d2s/dp2 */
         double *s = sOld;
-        double d2gdsdp[NS], d3gds3[NS][NS][NS], d3gds2dp[NS][NS], d3gdsdp2[NS],
-            dsdp[NS], temp[NS], temp2[NS];
+        double d2gdsdp[NS];
+        double d3gds3[NS][NS][NS];
+        double d3gds2dp[NS][NS];
+        double d3gdsdp2[NS];
+        double dsdp[NS], temp[NS], temp2[NS];
         gsl_vector_view vvToDsdp = gsl_vector_view_array(dsdp, (size_t) NS),
             vvToD2gdsdp = gsl_vector_view_array(d2gdsdp, (size_t) NS),
             vvToTemp = gsl_vector_view_array(temp, (size_t) NS), vvToTemp2 = gsl_vector_view_array(temp2, (size_t) NS);

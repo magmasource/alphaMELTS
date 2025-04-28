@@ -400,7 +400,6 @@ $(MELTSDYNAMICLIB)(sub-thermo-calc.o):          sub-thermo-calc.c silmin.h
 $(MELTSDYNAMICLIB)(wadsleyite.o):               wadsleyite.c silmin.h
 $(MELTSDYNAMICLIB)(water.o):                    water.c silmin.h
 $(MELTSDYNAMICLIB)(wustite.o):                  wustite.c silmin.h
-$(MELTSDYNAMICLIB)(recipes.o):                  recipes.c recipes.h
 
 $(ALPHAMELTSLIB)(adiabat_1ph.o):           adiabat_1ph.c adiabat.h silmin.h
 $(ALPHAMELTSLIB)(adiabat_support.o):       adiabat_support.c adiabat.h interface.h silmin.h status.h
@@ -475,7 +474,6 @@ $(MELTSDYNAMICLIB): $(MELTSDYNAMICLIB)(albite.o) \
                     $(MELTSDYNAMICLIB)(wadsleyite.o) \
                     $(MELTSDYNAMICLIB)(water.o) \
                     $(MELTSDYNAMICLIB)(wustite.o) \
-                    $(MELTSDYNAMICLIB)(recipes.o)
 	$(RANLIB) $(MELTSDYNAMICLIB)
 
 $(ALPHAMELTSLIB):   $(ALPHAMELTSLIB)(adiabat_1ph.o) \

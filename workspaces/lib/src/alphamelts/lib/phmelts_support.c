@@ -24,138 +24,141 @@
 
 void initializeLibrary(void) {
 
-  if (silminInputData.name == NULL)  silminInputData.name  = (char *) calloc((unsigned) (REC+1), sizeof(char));
-  if (silminInputData.title == NULL) silminInputData.title = (char *) calloc((unsigned) (REC+1), sizeof(char));
+    if (silminInputData.name == NULL)  silminInputData.name  = (char *) calloc((unsigned) (REC+1), sizeof(char));
+    if (silminInputData.title == NULL) silminInputData.title = (char *) calloc((unsigned) (REC+1), sizeof(char));
 
-  if ((calculationMode == MODE__MELTS) || (calculationMode > MODE__MELTSandCO2_H2O)) {
-    liquid = meltsLiquid;
-    solids = meltsSolids;
-    nlc    = meltsNlc;
-    nls    = meltsNls;
-    npc    = meltsNpc;
-  } else if ((calculationMode == MODE__MELTSandCO2) || (calculationMode == MODE__MELTSandCO2_H2O)) {
-    liquid = meltsFluidLiquid;
-    solids = meltsFluidSolids;
-    nlc = meltsFluidNlc;
-    nls = meltsFluidNls;
-    npc = meltsFluidNpc;
-  } else if (calculationMode == MODE_pMELTS) {
-    liquid = pMeltsLiquid;
-    solids = pMeltsSolids;
-    nlc    = pMeltsNlc;
-    nls    = pMeltsNls;
-    npc    = pMeltsNpc;
-  } else {
-    calculationMode = MODE_xMELTS;
-  }
-  InitComputeDataStruct();
+    if ((calculationMode == MODE__MELTS) || (calculationMode > MODE__MELTSandCO2_H2O)) {
+        liquid = meltsLiquid;
+        solids = meltsSolids;
+        nlc    = meltsNlc;
+        nls    = meltsNls;
+        npc    = meltsNpc;
+    } else if ((calculationMode == MODE__MELTSandCO2) || (calculationMode == MODE__MELTSandCO2_H2O)) {
+        liquid = meltsFluidLiquid;
+        solids = meltsFluidSolids;
+        nlc = meltsFluidNlc;
+        nls = meltsFluidNls;
+        npc = meltsFluidNpc;
+    } else if (calculationMode == MODE_pMELTS) {
+        liquid = pMeltsLiquid;
+        solids = pMeltsSolids;
+        nlc    = pMeltsNlc;
+        nls    = pMeltsNls;
+        npc    = pMeltsNpc;
+    } else {
+        // It should not be possible to get here through normal interfaces;
+        printf("ALPHAMELTS_CALC_MODE not set in initializeLibrary!\n\n");
+        printf("Please report the sequence of events which led to this disaster.\n\n");
+        calculationMode = MODE_xMELTS;
+    }
+    InitComputeDataStruct();
 }
 
 SilminState *reAllocSilminStatePointer(SilminState *q, size_t zOld, size_t z)
 {
-  int i, j;
-  SilminState *p = NULL;
+    int i, j;
+    SilminState *p = NULL;
 
-  if(z > zOld) {
+    if(z > zOld) {
 
-    p = (SilminState *) realloc(q, z*sizeof(SilminState));
-    for(i= (int) zOld; i< (int) z; i++) {
-      /* assume initialization with zero bytes yields default entries */
+        p = (SilminState *) realloc(q, z*sizeof(SilminState));
+        for(i= (int) zOld; i< (int) z; i++) {
+            /* assume initialization with zero bytes yields default entries */
 
-      p[i].nLiquidCoexist = 1;
-      p[i].liquidMass     = 0.0;
+            p[i].nLiquidCoexist = 1;
+            p[i].liquidMass     = 0.0;
 
-      /* allocate space for mandatory entries with zero bytes         */
-      p[i].bulkComp      = (double *)     calloc((size_t)  nc, sizeof(double));
-      p[i].dspBulkComp   = (double *)     calloc((size_t)  nc, sizeof(double *));
-      p[i].liquidComp    = (double **)    calloc((size_t)  1, sizeof(double *));
-      p[i].liquidComp[0]  = (double *)     calloc((size_t) nlc,     sizeof(double));
-      p[i].liquidDelta   = (double **)    calloc((size_t)  1, sizeof(double *));
-      p[i].liquidDelta[0] = (double *)     calloc((size_t) nlc,     sizeof(double));
-      p[i].solidComp     = (double **)    calloc((size_t) npc, sizeof(double *));
-      p[i].nSolidCoexist = (int *)        calloc((size_t) npc, sizeof(int));
-      p[i].solidDelta    = (double **)    calloc((size_t) npc, sizeof(double *));
-      p[i].incSolids     = (int *)        calloc((size_t) npc, sizeof(int));
-      p[i].cylSolids     = (int *)        calloc((size_t) npc, sizeof(int));
+            /* allocate space for mandatory entries with zero bytes         */
+            p[i].bulkComp      = (double *)     calloc((size_t)  nc, sizeof(double));
+            p[i].dspBulkComp   = (double *)     calloc((size_t)  nc, sizeof(double *));
+            p[i].liquidComp    = (double **)    calloc((size_t)  1, sizeof(double *));
+            p[i].liquidComp[0]  = (double *)     calloc((size_t) nlc,     sizeof(double));
+            p[i].liquidDelta   = (double **)    calloc((size_t)  1, sizeof(double *));
+            p[i].liquidDelta[0] = (double *)     calloc((size_t) nlc,     sizeof(double));
+            p[i].solidComp     = (double **)    calloc((size_t) npc, sizeof(double *));
+            p[i].nSolidCoexist = (int *)        calloc((size_t) npc, sizeof(int));
+            p[i].solidDelta    = (double **)    calloc((size_t) npc, sizeof(double *));
+            p[i].incSolids     = (int *)        calloc((size_t) npc, sizeof(int));
+            p[i].cylSolids     = (int *)        calloc((size_t) npc, sizeof(int));
 
-      for (j=0; j<npc; j++) {
-        (p[i].solidComp)[j]  = (double *) calloc((size_t)   1, sizeof(double));
+            for (j=0; j<npc; j++) {
+                (p[i].solidComp)[j]  = (double *) calloc((size_t)   1, sizeof(double));
       	(p[i].solidDelta)[j] = (double *) calloc((size_t)   1, sizeof(double));
-      }
-      p[i].fractionateSol = 0;
-      p[i].fractionateLiq = 0;
-      p[i].fractionateFlu = 0;
-      p[i].assimilate     = 0;
+            }
+            p[i].fractionateSol = 0;
+            p[i].fractionateLiq = 0;
+            p[i].fractionateFlu = 0;
+            p[i].assimilate     = 0;
 
-      p[i].nFracCoexist   = NULL;
-      p[i].fracSComp      = NULL;
-      p[i].fracLComp      = NULL;
+            p[i].nFracCoexist   = NULL;
+            p[i].fracSComp      = NULL;
+            p[i].fracLComp      = NULL;
 
-      p[i].dspAssimComp = NULL;
-      p[i].assimComp    = NULL;
-      p[i].nDspAssimComp = NULL;
-      p[i].nAssimComp    = NULL;
+            p[i].dspAssimComp = NULL;
+            p[i].assimComp    = NULL;
+            p[i].nDspAssimComp = NULL;
+            p[i].nAssimComp    = NULL;
 
-      p[i].ySol = NULL;
-      p[i].yLiq = NULL;
+            p[i].ySol = NULL;
+            p[i].yLiq = NULL;
 
+        }
     }
-  }
-  else if(z < zOld) {
+    else if(z < zOld) {
 
-    for(i = (int) z; i < (int) zOld; i++) {
+        for(i = (int) z; i < (int) zOld; i++) {
 
-      for (j=0; j<MAX(1,q[i].nLiquidCoexist);j++) {
-        free((q[i].liquidComp)[j]);
-        free((q[i].liquidDelta)[j]);
-      }
+            for (j=0; j<MAX(1,q[i].nLiquidCoexist);j++) {
+                free((q[i].liquidComp)[j]);
+                free((q[i].liquidDelta)[j]);
+            }
 
-      for (j=0;j<npc;j++) {
-        free((q[i].solidDelta)[j]);
-        free((q[i].solidComp)[j]);
-      }
+            for (j=0;j<npc;j++) {
+                free((q[i].solidDelta)[j]);
+                free((q[i].solidComp)[j]);
+            }
 
-      free(q[i].incSolids);
-      free(q[i].cylSolids);
-      free(q[i].solidDelta);
-      free(q[i].nSolidCoexist);
-      free(q[i].solidComp);
-      free(q[i].liquidDelta);
-      free(q[i].liquidComp);
-      free(q[i].dspBulkComp);
-      free(q[i].bulkComp);
+            free(q[i].incSolids);
+            free(q[i].cylSolids);
+            free(q[i].solidDelta);
+            free(q[i].nSolidCoexist);
+            free(q[i].solidComp);
+            free(q[i].liquidDelta);
+            free(q[i].liquidComp);
+            free(q[i].dspBulkComp);
+            free(q[i].bulkComp);
 
-      /* NEED TO FREE FRAC AND ASSIM COMPS IN HERE */
+            /* NEED TO FREE FRAC AND ASSIM COMPS IN HERE */
 #ifdef PHMELTS_ADJUSTMENTS
-  if (q[i].fracSComp != NULL) {
-    for (i=0; i<npc; i++) if ((q[i].fracSComp)[i] != NULL) free((q[i].fracSComp)[i]);
-    free(q[i].fracSComp);
-  }
-  if (q[i].nFracCoexist != NULL) free(q[i].nFracCoexist);
+    if (q[i].fracSComp != NULL) {
+        for (j=0; j<npc; j++) if ((q[i].fracSComp)[j] != NULL) free((q[i].fracSComp)[j]);
+        free(q[i].fracSComp);
+    }
+    if (q[i].nFracCoexist != NULL) free(q[i].nFracCoexist);
 
-  if (q[i].fracLComp != NULL) free(q[i].fracLComp);
+    if (q[i].fracLComp != NULL) free(q[i].fracLComp);
 
-  if (q[i].dspAssimComp != NULL) {
-    for (i=0; i<(npc+nc); i++)  if ((q[i].dspAssimComp)[i] != NULL) free((q[i].dspAssimComp)[i]);
-    free(q[i].dspAssimComp);
-  }
-  if (q[i].assimComp != NULL) {
-    for (i=0; i<(npc+nlc); i++) if ((q[i].assimComp)[i]    != NULL) free((q[i].assimComp)[i]);
-    free(q[i].assimComp);
-  }
-  if (q[i].nDspAssimComp != NULL) free(q[i].nDspAssimComp);
-  if (q[i].nAssimComp    != NULL) free(q[i].nAssimComp);
+    if (q[i].dspAssimComp != NULL) {
+        for (j=0; j<(npc+nc); j++)  if ((q[i].dspAssimComp)[j] != NULL) free((q[i].dspAssimComp)[j]);
+        free(q[i].dspAssimComp);
+    }
+    if (q[i].assimComp != NULL) {
+        for (j=0; j<(npc+nlc); j++) if ((q[i].assimComp)[j]    != NULL) free((q[i].assimComp)[j]);
+        free(q[i].assimComp);
+    }
+    if (q[i].nDspAssimComp != NULL) free(q[i].nDspAssimComp);
+    if (q[i].nAssimComp    != NULL) free(q[i].nAssimComp);
 
-  if ((q[i].ySol) != NULL) free(q[i].ySol);
-  if ((q[i].yLiq) != NULL) free(q[i].yLiq);
+    if ((q[i].ySol) != NULL) free(q[i].ySol);
+    if ((q[i].yLiq) != NULL) free(q[i].yLiq);
 #endif
 
-    }
-    p = (SilminState *) realloc(q, z*sizeof(SilminState));
+        }
+        p = (SilminState *) realloc(q, z*sizeof(SilminState));
 
-  }
-  else p = q;
-  return p;
+    }
+    else p = q;
+    return p;
 }
 
 void copyStateInfo(SilminState *target, SilminState *source)
@@ -165,9 +168,9 @@ void copyStateInfo(SilminState *target, SilminState *source)
 
 /*void freeSilminStatePointer(SilminState *p) {
 
-  destroySilminStateStructure((void *) p);
+    destroySilminStateStructure((void *) p);
 
-  }*/
+    }*/
 
 #undef REALLOC
 

@@ -155,19 +155,19 @@ MELTS Source Code: RCS
 
 static double **matrix_alloc(int n1, int n2) {
     int i;
-    double **m = (double **) malloc((size_t) (n1+1)*sizeof(double *));
-    for (i=0; i<(n1+1); i++) m[i] = (double *) malloc((size_t) (n2+1)*sizeof(double));
+    double *m0 = (double *) malloc((size_t) n1*n2*sizeof(double));
+    double **m = (double **) malloc((size_t) n1*sizeof(double *));
+    for (i=0; i<n1; i++) m[i] = &m0[i*n2];
     return m;
 }
 
 static void matrix_free(double **m, int n1, int n2) {
-    int i;
-    for (i=0; i<(n1+1); i++) free(m[i]);
+    free(m[0]);
     free(m);
 }
 
 static double *vector_alloc(int n) {
-    double *v = (double *) malloc((size_t) (n+1)*sizeof(double));
+    double *v = (double *) malloc((size_t) n*sizeof(double));
     return v;
 }
 
@@ -397,7 +397,7 @@ void getEqualityConstraints(int *conRows, int *conCols, double ***cMatrixPt,
     /* replace xH2O constraint with aH2O constraint if so desired; for now only implement isothermal, isobaric case */
     if (H2Obuffer) {
         double *gradH2O = vector_alloc(nlc);
-        for (n=0,j=0;n<silminState->nLiquidCoexist ;n++) {
+        for (n=0, j=0; n<silminState->nLiquidCoexist; n++) {
             muH2OLiq(SECOND, silminState->T, silminState->P, silminState->liquidComp[n], NULL, gradH2O, NULL, NULL, NULL, NULL, NULL, NULL,  NULL, NULL);
             for (i=0; i<nlc; i++) if ((silminState->liquidComp)[n][i] > 0.0) cMatrix[indexH2O][j++] = gradH2O[i];
         }
@@ -417,12 +417,12 @@ void getEqualityConstraints(int *conRows, int *conCols, double ***cMatrixPt,
         l = 0;
 
         if (hasLiquid) {
-            rLiq      = vector_alloc(nlc-2);
-            drdmLiq   = matrix_alloc(nlc-2, nlc-1);
+            rLiq      = vector_alloc(nlc-1);
+            drdmLiq   = matrix_alloc(nlc-1, nlc);
             d2rdm2Liq = (double ***) malloc((unsigned) (nlc-1)*sizeof(double **));
-            for (i=0; i<(nlc-1); i++) d2rdm2Liq[i] = matrix_alloc(nlc-1, nlc-1);
-            dpMixLiq  = vector_alloc(nlc-2);
-            dpLiq     = vector_alloc(nlc-1);
+            for (i=0; i<(nlc-1); i++) d2rdm2Liq[i] = matrix_alloc(nlc, nlc);
+            dpMixLiq  = vector_alloc(nlc-1);
+            dpLiq     = vector_alloc(nlc);
 
             for (nl=0; nl<silminState->nLiquidCoexist; nl++) {
                 conLiq(SECOND, THIRD | FIFTH | SIXTH, silminState->T, silminState->P, NULL, silminState->liquidComp[nl], rLiq, NULL, drdmLiq, d2rdm2Liq, NULL);
@@ -461,11 +461,11 @@ void getEqualityConstraints(int *conRows, int *conCols, double ***cMatrixPt,
                 if (isochoric) cMatrix[k][indexP] = dpLiqdP;
             }
 
-            vector_free(dpMixLiq, nlc-2);
-            vector_free(dpLiq, nlc-1);
-            vector_free(rLiq, nlc-2);
-            matrix_free(drdmLiq, nlc-2, nlc-1);
-            for (i=0; i<(nlc-1); i++) matrix_free(d2rdm2Liq[i], nlc-1, nlc-1);
+            vector_free(dpMixLiq, nlc-1);
+            vector_free(dpLiq, nlc);
+            vector_free(rLiq, nlc-1);
+            matrix_free(drdmLiq, nlc-1, nlc);
+            for (i=0; i<(nlc-1); i++) matrix_free(d2rdm2Liq[i], nlc, nlc);
             free(d2rdm2Liq);
         }
 
@@ -487,13 +487,13 @@ void getEqualityConstraints(int *conRows, int *conCols, double ***cMatrixPt,
                     int nr = solids[j].nr;
                     int na = solids[j].na;
 
-                    rSol      = vector_alloc(nr-1);
-                    mSol      = vector_alloc(na-1);
-                    drdmSol   = matrix_alloc(nr-1, na-1);
+                    rSol      = vector_alloc(nr);
+                    mSol      = vector_alloc(na);
+                    drdmSol   = matrix_alloc(nr, na);
                     d2rdm2Sol = (double ***) malloc((unsigned) nr*sizeof(double **));
-                    for (i=0; i<nr; i++) d2rdm2Sol[i] = matrix_alloc(na-1, na-1);
-                    dpMixSol  = vector_alloc(nr-1);
-                    dpSol     = vector_alloc(na-1);
+                    for (i=0; i<nr; i++) d2rdm2Sol[i] = matrix_alloc(na, na);
+                    dpMixSol  = vector_alloc(nr);
+                    dpSol     = vector_alloc(na);
 
                     for (n=0; n<ns; n++) {
                         mTotal = (silminState->solidComp)[j][n];
@@ -534,13 +534,13 @@ void getEqualityConstraints(int *conRows, int *conCols, double ***cMatrixPt,
                         if (isochoric) cMatrix[k][indexP] += dpSoldP;
 
                     }
-                    vector_free(rSol, nr-1);
-                    vector_free(mSol, na-1);
-                    matrix_free(drdmSol, nr-1, na-1);
-                    for (i=0; i<nr; i++) matrix_free(d2rdm2Sol[i], na-1, na-1);
+                    vector_free(rSol, nr);
+                    vector_free(mSol, na);
+                    matrix_free(drdmSol, nr, na);
+                    for (i=0; i<nr; i++) matrix_free(d2rdm2Sol[i], na, na);
                     free(d2rdm2Sol);
-                    vector_free(dpMixSol, nr-1);
-                    vector_free(dpSol, na-1);
+                    vector_free(dpMixSol, nr);
+                    vector_free(dpSol, na);
                 }
             }
         }

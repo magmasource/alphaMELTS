@@ -198,6 +198,10 @@ melts_LU_svx (const gsl_matrix * LU, const gsl_permutation * p, gsl_vector * x)
 int
 melts_LU_refine (const gsl_matrix * A, const gsl_matrix * LU, const gsl_permutation * p, const gsl_vector * b, gsl_vector * x, gsl_vector * residual)
 {
+  /* Assumes that the matrix A is symmetrical. Any zero rows / columns are
+     ignored for LU decomposition and later solution. If the packed matrix
+     in melts_LU_decomp, A2, is 1x1 LU decomposition does nothing so 1/A
+     was stored. If A2 was 0x0 (singular) then 0.0 was stored. */
   if (A->size1 != A->size2)
     {
       GSL_ERROR ("matrix a must be square", GSL_ENOTSQR);

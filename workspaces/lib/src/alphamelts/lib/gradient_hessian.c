@@ -183,19 +183,19 @@ MELTS Source Code: RCS
 
 static double **matrix_alloc(int n1, int n2) {
     int i;
-    double **m = (double **) malloc((size_t) (n1+1)*sizeof(double *));
-    for (i=0; i<(n1+1); i++) m[i] = (double *) malloc((size_t) (n2+1)*sizeof(double));
+    double *m0 = (double *) malloc((size_t) n1*n2*sizeof(double));
+    double **m = (double **) malloc((size_t) n1*sizeof(double *));
+    for (i=0; i<n1; i++) m[i] = &m0[i*n2];
     return m;
 }
 
 static void matrix_free(double **m, int n1, int n2) {
-    int i;
-    for (i=0; i<(n1+1); i++) free(m[i]);
+    free(m[0]);
     free(m);
 }
 
 static double *vector_alloc(int n) {
-    double *v = (double *) malloc((size_t) (n+1)*sizeof(double));
+    double *v = (double *) malloc((size_t) n*sizeof(double));
     return v;
 }
 
@@ -307,12 +307,12 @@ int getProjGradientAndHessian(int conRows, int conCols, double ***eMatrixPt,
 #endif
     if (isentropic || isenthalpic) {
         indexT   = conCols - 1;
-        eMatrixT = matrix_alloc(conCols-1, conCols-1);
+        eMatrixT = matrix_alloc(conCols, conCols);
         for (i=0; i<conCols; i++) for (j=0; j<conCols; j++) eMatrixT[i][j] = 0.0;
     }
     if (isochoric) {
         indexP   = conCols - 1;
-        eMatrixP = matrix_alloc(conCols-1, conCols-1);
+        eMatrixP = matrix_alloc(conCols, conCols);
         for (i=0; i<conCols; i++) for (j=0; j<conCols; j++) eMatrixP[i][j] = 0.0;
     }
 #ifdef PHMELTS_ADJUSTMENTS
@@ -330,23 +330,23 @@ int getProjGradientAndHessian(int conRows, int conCols, double ***eMatrixPt,
      thermodynamic potential we seek to minimize
    ****************************************************************************/
     if (hasLiquid) {
-        rLiq      = vector_alloc(nlc-2);
-        drdmLiq   = matrix_alloc(nlc-2, nlc-1);
+        rLiq      = vector_alloc(nlc-1);
+        drdmLiq   = matrix_alloc(nlc-1, nlc);
         d2rdm2Liq = (double ***) malloc((size_t) (nlc-1)*sizeof(double **));
-        for (i=0; i<(nlc-1); i++) d2rdm2Liq[i] = matrix_alloc(nlc-1, nlc-1);
+        for (i=0; i<(nlc-1); i++) d2rdm2Liq[i] = matrix_alloc(nlc, nlc);
 
-        dpMixLiq  = vector_alloc(nlc-2);
-        dpLiq     = vector_alloc(nlc-1);
-        d2pMixLiq = matrix_alloc(nlc-2, nlc-2);
-        d2pLiq    = matrix_alloc(nlc-1, nlc-1);
+        dpMixLiq  = vector_alloc(nlc-1);
+        dpLiq     = vector_alloc(nlc);
+        d2pMixLiq = matrix_alloc(nlc-1, nlc-1);
+        d2pLiq    = matrix_alloc(nlc, nlc);
 
         if (isenthalpic || isentropic || isochoric) {
-            dpMixTmp  = vector_alloc(nlc-2);
-            dpMixCon  = vector_alloc(nlc-2);
-            d2pMixTmp = matrix_alloc(nlc-2, nlc-2);
-            dpTmp     = vector_alloc(nlc-1);
-            dpCon     = vector_alloc(nlc-1);
-            d2pTmp    = matrix_alloc(nlc-1, nlc-1);
+            dpMixTmp  = vector_alloc(nlc-1);
+            dpMixCon  = vector_alloc(nlc-1);
+            d2pMixTmp = matrix_alloc(nlc-1, nlc-1);
+            dpTmp     = vector_alloc(nlc);
+            dpCon     = vector_alloc(nlc);
+            d2pTmp    = matrix_alloc(nlc, nlc);
         } else {
             dpMixTmp  = NULL;
             dpMixCon  = NULL;
@@ -521,20 +521,20 @@ int getProjGradientAndHessian(int conRows, int conCols, double ***eMatrixPt,
         } /* End loop on number of liquids */
 
         /* Delete storage for the liquid                                            */
-        matrix_free(d2pLiq, nlc-1, nlc-1);
-        vector_free(dpLiq, nlc-1);
-        matrix_free(d2pMixLiq, nlc-2, nlc-2);
-        vector_free(dpMixLiq, nlc-2);
-        for (i=0; i<(nlc-1); i++) matrix_free(d2rdm2Liq[i], nlc-1, nlc-1);
+        matrix_free(d2pLiq, nlc, nlc);
+        vector_free(dpLiq, nlc);
+        matrix_free(d2pMixLiq, nlc-1, nlc-1);
+        vector_free(dpMixLiq, nlc-1);
+        for (i=0; i<(nlc-1); i++) matrix_free(d2rdm2Liq[i], nlc, nlc);
         free(d2rdm2Liq);
-        matrix_free(drdmLiq, nlc-2, nlc-1);
+        matrix_free(drdmLiq, nlc-1, nlc);
         vector_free(rLiq, nlc-2);
-        if (dpMixTmp  != (double *)  NULL) vector_free(dpMixTmp,  nlc-2);
-        if (dpMixCon  != (double *)  NULL) vector_free(dpMixCon,  nlc-2);
-        if (d2pMixTmp != (double **) NULL) matrix_free(d2pMixTmp, nlc-2, nlc-2);
-        if (dpTmp     != (double *)  NULL) vector_free(dpTmp,     nlc-1);
-        if (dpCon     != (double *)  NULL) vector_free(dpCon,     nlc-1);
-        if (d2pTmp    != (double **) NULL) matrix_free(d2pTmp,    nlc-1, nlc-1);
+        if (dpMixTmp  != (double *)  NULL) vector_free(dpMixTmp,  nlc-1);
+        if (dpMixCon  != (double *)  NULL) vector_free(dpMixCon,  nlc-1);
+        if (d2pMixTmp != (double **) NULL) matrix_free(d2pMixTmp, nlc-1, nlc-1);
+        if (dpTmp     != (double *)  NULL) vector_free(dpTmp,     nlc);
+        if (dpCon     != (double *)  NULL) vector_free(dpCon,     nlc);
+        if (d2pTmp    != (double **) NULL) matrix_free(d2pTmp,    nlc, nlc);
     } else colRow = 0;
 
     /* mu O2 path constraints - revised formulation 2/16/00 */
@@ -568,9 +568,9 @@ int getProjGradientAndHessian(int conRows, int conCols, double ***eMatrixPt,
         *************************************************************************/
         if (hasLiquid) {
             muO2L      = vector_alloc(silminState->nLiquidCoexist);
-            dmuO2Ldm   = matrix_alloc(silminState->nLiquidCoexist, nlc-1);
+            dmuO2Ldm   = matrix_alloc(silminState->nLiquidCoexist, nlc);
             d2muO2Ldm2 = (double ***) malloc((size_t) silminState->nLiquidCoexist*sizeof(double **));
-            for (nl=0; nl<silminState->nLiquidCoexist; nl++) d2muO2Ldm2[nl] = matrix_alloc(nlc-1, nlc-1);
+            for (nl=0; nl<silminState->nLiquidCoexist; nl++) d2muO2Ldm2[nl] = matrix_alloc(nlc, nlc);
         } else {
             dmuO2Sdm   = vector_alloc(2*npc);
             d2muO2Sdm2 = matrix_alloc(2*npc, 2*npc);
@@ -578,7 +578,7 @@ int getProjGradientAndHessian(int conRows, int conCols, double ***eMatrixPt,
         if (isenthalpic || isentropic) {
             muO2Flags |= THIRD | SIXTH | EIGHTH;
             if (hasLiquid) {
-                d2muO2Ldmdt = matrix_alloc(silminState->nLiquidCoexist, nlc-1);
+                d2muO2Ldmdt = matrix_alloc(silminState->nLiquidCoexist, nlc);
                 dmuO2Ldt    = vector_alloc(silminState->nLiquidCoexist);
                 d2muO2Ldt2  = vector_alloc(silminState->nLiquidCoexist);
             } else {
@@ -587,7 +587,7 @@ int getProjGradientAndHessian(int conRows, int conCols, double ***eMatrixPt,
         } else if (isochoric) {
             muO2Flags |= FOURTH | SEVENTH | TENTH;
             if (hasLiquid) {
-                d2muO2Ldmdp = matrix_alloc(silminState->nLiquidCoexist, nlc-1);
+                d2muO2Ldmdp = matrix_alloc(silminState->nLiquidCoexist, nlc);
                 dmuO2Ldp    = vector_alloc(silminState->nLiquidCoexist);
                 d2muO2Ldp2  = vector_alloc(silminState->nLiquidCoexist);
             } else {
@@ -731,7 +731,7 @@ int getProjGradientAndHessian(int conRows, int conCols, double ***eMatrixPt,
 
         eMatrixfO2 = (double ***) malloc((size_t) ((hasLiquid) ? silminState->nLiquidCoexist : 1)*sizeof(double **));
         for (nl=0; nl<((hasLiquid) ? silminState->nLiquidCoexist : 1); nl++) {
-            eMatrixfO2[nl] = matrix_alloc(conCols-1, conCols-1);
+            eMatrixfO2[nl] = matrix_alloc(conCols, conCols);
             for (i=0; i<conCols; i++) for (j=0; j<conCols; j++) eMatrixfO2[nl][i][j] = 0.0;
         }
 
@@ -886,7 +886,7 @@ int getProjGradientAndHessian(int conRows, int conCols, double ***eMatrixPt,
         dmuH2Odm   = matrix_alloc(silminState->nLiquidCoexist, nlc);
         d2muH2Odm2 = (double ***) malloc((size_t) silminState->nLiquidCoexist*sizeof(double **));
         for (nl=0; nl<silminState->nLiquidCoexist; nl++) d2muH2Odm2[nl] = matrix_alloc(nlc, nlc);
-        eMatrixH2O = matrix_alloc(conCols-1, conCols-1);
+        eMatrixH2O = matrix_alloc(conCols, conCols);
         for (i=0; i<conCols; i++) for (j=0; j<conCols; j++) eMatrixH2O[i][j] = 0.0;
 
         for (nl=0, k=0; nl< silminState->nLiquidCoexist; nl++) {
@@ -1093,22 +1093,22 @@ int getProjGradientAndHessian(int conRows, int conCols, double ***eMatrixPt,
                 int na = solids[i].na;
 
                 /* Allocate storage for this solid */
-                rSol      = vector_alloc(nr-1);
-                mSol      = vector_alloc(na-1);
-                drdmSol   = matrix_alloc(nr-1, na-1);
+                rSol      = vector_alloc(nr);
+                mSol      = vector_alloc(na);
+                drdmSol   = matrix_alloc(nr, na);
                 d2rdm2Sol = (double ***) malloc((size_t) nr*sizeof(double **));
-                for (j=0; j<nr; j++) d2rdm2Sol[j] = matrix_alloc(na-1, na-1);
-                dpMixSol  = vector_alloc(nr-1);
-                d2pMixSol = matrix_alloc(nr-1, nr-1);
-                dpSol  = vector_alloc(na-1);
-                d2pSol = matrix_alloc(na-1, na-1);
+                for (j=0; j<nr; j++) d2rdm2Sol[j] = matrix_alloc(na, na);
+                dpMixSol  = vector_alloc(nr);
+                d2pMixSol = matrix_alloc(nr, nr);
+                dpSol  = vector_alloc(na);
+                d2pSol = matrix_alloc(na, na);
                 if (isenthalpic || isentropic || isochoric) {
-                    dpMixTmp  = vector_alloc(nr-1);
-                    dpMixCon  = vector_alloc(nr-1);
-                    d2pMixTmp = matrix_alloc(nr-1, nr-1);
-                    dpTmp     = vector_alloc(na-1);
-                    dpCon     = vector_alloc(na-1);
-                    d2pTmp    = matrix_alloc(na-1, na-1);
+                    dpMixTmp  = vector_alloc(nr);
+                    dpMixCon  = vector_alloc(nr);
+                    d2pMixTmp = matrix_alloc(nr, nr);
+                    dpTmp     = vector_alloc(na);
+                    dpCon     = vector_alloc(na);
+                    d2pTmp    = matrix_alloc(na, na);
                 } else {
                     dpMixTmp  = (double *)  NULL;
                     dpMixCon  = (double *)  NULL;
@@ -1422,21 +1422,21 @@ int getProjGradientAndHessian(int conRows, int conCols, double ***eMatrixPt,
                 } /* end loop on coexisting phases */
 
                 /* Delete storage for the solid                                       */
-                matrix_free(d2pSol, na-1, na-1);
-                vector_free(dpSol, na-1);
-                matrix_free(d2pMixSol, nr-1, nr-1);
-                vector_free(dpMixSol, nr-1);
-                for (j=0; j<nr; j++) matrix_free(d2rdm2Sol[j], na-1, na-1);
+                matrix_free(d2pSol, na, na);
+                vector_free(dpSol, na);
+                matrix_free(d2pMixSol, nr, nr);
+                vector_free(dpMixSol, nr);
+                for (j=0; j<nr; j++) matrix_free(d2rdm2Sol[j], na, na);
                 free(d2rdm2Sol);
-                matrix_free(drdmSol, nr-1, na-1);
-                vector_free(rSol, nr-1);
-                vector_free(mSol, na-1);
-                if (dpMixTmp  != (double *)  NULL) vector_free(dpMixTmp,  nr-1);
-                if (dpMixCon  != (double *)  NULL) vector_free(dpMixCon,  nr-1);
-                if (d2pMixTmp != (double **) NULL) matrix_free(d2pMixTmp, nr-1, nr-1);
-                if (dpTmp     != (double *)  NULL) vector_free(dpTmp,     na-1);
-                if (dpCon     != (double *)  NULL) vector_free(dpCon,     na-1);
-                if (d2pTmp    != (double **) NULL) matrix_free(d2pTmp,    na-1, na-1);
+                matrix_free(drdmSol, nr, na);
+                vector_free(rSol, nr);
+                vector_free(mSol, na);
+                if (dpMixTmp  != (double *)  NULL) vector_free(dpMixTmp,  nr);
+                if (dpMixCon  != (double *)  NULL) vector_free(dpMixCon,  nr);
+                if (d2pMixTmp != (double **) NULL) matrix_free(d2pMixTmp, nr, nr);
+                if (dpTmp     != (double *)  NULL) vector_free(dpTmp,     na);
+                if (dpCon     != (double *)  NULL) vector_free(dpCon,     na);
+                if (d2pTmp    != (double **) NULL) matrix_free(d2pTmp,    na, na);
 
             }
         }
@@ -1448,8 +1448,8 @@ int getProjGradientAndHessian(int conRows, int conCols, double ***eMatrixPt,
         if (hasLiquid) {
             vector_free(mO2L,     silminState->nLiquidCoexist);
             vector_free(muO2L,    silminState->nLiquidCoexist);
-            matrix_free(dmuO2Ldm, silminState->nLiquidCoexist, nlc-1);
-            for (nl=0; nl<silminState->nLiquidCoexist; nl++) matrix_free(d2muO2Ldm2[nl], nlc-1, nlc-1);
+            matrix_free(dmuO2Ldm, silminState->nLiquidCoexist, nlc);
+            for (nl=0; nl<silminState->nLiquidCoexist; nl++) matrix_free(d2muO2Ldm2[nl], nlc, nlc);
             free(d2muO2Ldm2);
         } else {
             vector_free(dmuO2Sdm,   2*npc);
@@ -1457,7 +1457,7 @@ int getProjGradientAndHessian(int conRows, int conCols, double ***eMatrixPt,
         }
         if (isenthalpic || isentropic) {
             if (hasLiquid) {
-                matrix_free(d2muO2Ldmdt, silminState->nLiquidCoexist, nlc-1);
+                matrix_free(d2muO2Ldmdt, silminState->nLiquidCoexist, nlc);
                 vector_free(dmuO2Ldt,    silminState->nLiquidCoexist);
                 vector_free(d2muO2Ldt2,  silminState->nLiquidCoexist);
             } else {
@@ -1465,7 +1465,7 @@ int getProjGradientAndHessian(int conRows, int conCols, double ***eMatrixPt,
             }
         } else if (isochoric) {
             if (hasLiquid) {
-                matrix_free(d2muO2Ldmdp, silminState->nLiquidCoexist, nlc-1);
+                matrix_free(d2muO2Ldmdp, silminState->nLiquidCoexist, nlc);
                 vector_free(dmuO2Ldp,    silminState->nLiquidCoexist);
                 vector_free(d2muO2Ldp2,  silminState->nLiquidCoexist);
             } else {
@@ -1486,7 +1486,7 @@ int getProjGradientAndHessian(int conRows, int conCols, double ***eMatrixPt,
    *****************************************************************************************************/
 
     if (hasNlCon) {
-        double **gMatrix = matrix_alloc(conCols, 0);
+        double **gMatrix = matrix_alloc(conCols, 1);
         for (i=0; i<conCols; i++) gMatrix[i][0] = - bMatrix[i][0];
 
         /* Form (K^^T) g */
@@ -1510,7 +1510,7 @@ int getProjGradientAndHessian(int conRows, int conCols, double ***eMatrixPt,
 #ifdef PHMELTS_ADJUSTMENTS
         if (H2Obuffer) constraints->lambdaH2O = constraints->lambda[indexH2O];
 #endif
-        matrix_free(gMatrix, conCols, 0);
+        matrix_free(gMatrix, conCols, 1);
     }
 
     /****************************************************************************

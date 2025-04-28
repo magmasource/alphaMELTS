@@ -351,19 +351,19 @@ static void (*oldErrorHandler)();      /* old error handler function */
 
 static double **matrix_alloc(int n1, int n2) {
     int i;
-    double **m = (double **) malloc((size_t) (n1+1)*sizeof(double *));
-    for (i=0; i<(n1+1); i++) m[i] = (double *) malloc((size_t) (n2+1)*sizeof(double));
+    double *m0 = (double *) malloc((size_t) n1*n2*sizeof(double));
+    double **m = (double **) malloc((size_t) n1*sizeof(double *));
+    for (i=0; i<n1; i++) m[i] = &m0[i*n2];
     return m;
 }
 
 static void matrix_free(double **m, int n1, int n2) {
-    int i;
-    for (i=0; i<(n1+1); i++) free(m[i]);
+    free(m[0]);
     free(m);
 }
 
 static double *vector_alloc(int n) {
-    double *v = (double *) malloc((size_t) (n+1)*sizeof(double));
+    double *v = (double *) malloc((size_t) n*sizeof(double));
     return v;
 }
 
@@ -372,7 +372,7 @@ static void vector_free(double *v, int n) {
 }
 
 static int *permutation_alloc(int n) {
-    int *p = (int *) malloc((size_t) (n+1)*sizeof(int));
+    int *p = (int *) malloc((size_t) n*sizeof(int));
     return p;
 }
 
@@ -1062,10 +1062,10 @@ int silmin(void)
                 int    *pVector, pseudoRank, nLiqs, nSols, nCmps;
                 double tolerance = 10.0*DBL_EPSILON /**DBL_EPSILON */, scale = DBL_MIN, fNORM;
 
-                aMatrix =  matrix_alloc(conCols-conRows-1, conCols-conRows-1);
-                hVector =  vector_alloc(conCols-conRows-1);
-                gVector =  vector_alloc(conCols-conRows-1);
-                pVector =  permutation_alloc(conCols-conRows-1);
+                aMatrix =  matrix_alloc(conCols-conRows, conCols-conRows);
+                hVector =  vector_alloc(conCols-conRows);
+                gVector =  vector_alloc(conCols-conRows);
+                pVector =  permutation_alloc(conCols-conRows);
 
 #ifdef PHMELTS_ADJUSTMENTS
                 nLiqs = (silminState->incLiquids > 1) ? silminState->nLiquidCoexist : 1;
@@ -1112,10 +1112,10 @@ int silmin(void)
          */
 #endif
 
-                permutation_free(pVector, conCols-conRows-1);
-                vector_free (gVector, conCols-conRows-1);
-                vector_free (hVector, conCols-conRows-1);
-                matrix_free (aMatrix, conCols-conRows-1, conCols-conRows-1);
+                permutation_free(pVector, conCols-conRows);
+                vector_free (gVector, conCols-conRows);
+                vector_free (hVector, conCols-conRows);
+                matrix_free (aMatrix, conCols-conRows, conCols-conRows);
             } else if (silminState->isenthalpic && (silminState->refEnthalpy != 0.0)) {
                 correctTforChangeInEnthalpy();
 #ifndef BATCH_VERSION

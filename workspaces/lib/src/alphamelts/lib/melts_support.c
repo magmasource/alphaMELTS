@@ -249,16 +249,16 @@ const ElementsData elements[] = {
 const int ne = (sizeof elements / sizeof (struct _elementsData));
 
 static double **matrix_alloc(int n1, int n2) {
-    int i;
-    double **m = (double **) malloc((size_t) n1*sizeof(double *));
-    for (i=0; i<n1; i++) m[i] = (double *) malloc((size_t) n2*sizeof(double));
-    return m;
+   int i;
+   double *m0 = (double *) malloc((size_t) n1*n2*sizeof(double));
+   double **m = (double **) malloc((size_t) n1*sizeof(double *));
+   for (i=0; i<n1; i++) m[i] = &m0[i*n2];
+   return m;
 }
 
 static void matrix_free(double **m, int n1, int n2) {
-    int i;
-    for (i=0; i<n1; i++) free(m[i]);
-    free(m);
+   free(m[0]);
+   free(m);
 }
 
 void InitComputeDataStruct(void)
