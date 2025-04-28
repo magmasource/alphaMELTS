@@ -103,7 +103,7 @@ until (@argv2) {
     $run_path = $0; # $0 is the name (and path) of the run-alphamelts script (not the .bat)
     $run_path =~ s/run-alphamelts.pl//;
     $run = '';
-    $program = 'alphamelts2';
+    $program = 'alphamelts2'; # for backwards compatibility until alphamelts 1.9 is retired
 
     $in_file = $settings_file = '';
     $log_file = '';
