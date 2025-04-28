@@ -297,7 +297,7 @@ int liquidus(void)
 /* Adapted from rMELTSframework.m */
 int findWetLiquidus(void) {
     int *oldIncSolids = (int *) malloc((size_t) npc*sizeof(int));
-    double oldT = 0.0;
+    double oldT = 0.0, dspTstart, dspTstop, dspTinc;
     int i, j, iter = 0, failure = TRUE;
 
     if ((silminState->solidMass > 0.0) || (silminState->nLiquidCoexist > 1)) {
@@ -305,7 +305,10 @@ int findWetLiquidus(void) {
         printf("<><><><> !!! <><><><> Unable to locate (Wet) liquidus with solids/multiple liquids present.\n");
     }
     else {
-        do {
+      dspTstart = silminState->dspTstart;
+      dspTstop  = silminState->dspTstop;
+      dspTinc   = silminState->dspTinc;
+      do {
             oldT = silminState->T;
             for (i=0, j=0; i<npc; i++) if ((solids[i].type == PHASE) && (solids[i].nr == 0 || (solids[i].nr > 0 && solids[i].convert != NULL))) {
                     oldIncSolids[j] = (silminState->incSolids)[j];
@@ -313,6 +316,9 @@ int findWetLiquidus(void) {
                     if (!strcmp("fluid", solids[i].label)) (silminState->incSolids)[j] = TRUE;
                     j++;
                 }
+            silminState->dspTstart   = oldT;
+            silminState->dspTstop    = oldT;
+            silminState->dspTinc     = 0.0;
             while(!silmin());
             fprintf(stderr, "<><><><> !!! <><><><> T after equilibrate: %lf\n", silminState->T);
             if (meltsStatus.status != SILMIN_SUCCESS) {
@@ -333,15 +339,20 @@ int findWetLiquidus(void) {
                 break;
             }
 
-#ifndef ALPHAMELTS_UPDATE_SYSTEM
-            /* check what should happen if coming from MATLAB/Python */
-            silminState->dspTstart = silminState->T;
+#ifdef ALPHAMELTS_UPDATE_SYSTEM
+            silminState->dspTstart = silminState->T - 273.15; // dspT in C
+            silminState->dspTstop  = dspTstop;
+#else
+            silminState->dspTstart = silminState->T; // dspT in K
             silminState->dspTstop  = silminState->T;
 #endif
             iter++;
         } while ((fabs(oldT - silminState->T) > 0.5) && (iter < 50));
+        silminState->dspTinc     = dspTinc;
 
         if (iter == 50) {
+            silminState->dspTstart = dspTstart;
+            silminState->dspTstop  = dspTstop;
             meltsStatus.status = GENERIC_INTERNAL_ERROR;
             printf("<><><><> !!! <><><><> Unable to locate (Wet) liquidus.\n");
         } else {
