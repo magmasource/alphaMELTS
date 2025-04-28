@@ -12,5 +12,5 @@ The [Generic Mapping Tools](https://www.generic-mapping-tools.org/) (GMT) progra
 
 More examples can be found on the MAGMA Source GitList site: https://magmasource.caltech.edu/gitlist/Workshops.git/
 
-These will eventually move to a dedicated site, to be hosted at alphamelts.caltech.edu.
+These will eventually be copied to a dedicated site, to be hosted at alphamelts.caltech.edu.
 
