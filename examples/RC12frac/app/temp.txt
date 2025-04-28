@@ -1,0 +1,17 @@
+
+! <><> alphaMELTS run by paulasimow <><> 
+! Time started: Nov 22 2020 at 21:13 
+
+! Command line: -p RC12frac-output-test -c col_custom.txt -o custom_output_tbl.txt 
+
+! alphaMELTS menu input used: 
+
+y
+n
+y
+1
+KM0417_RC12_frac.melts 
+4
+2
+0
+x

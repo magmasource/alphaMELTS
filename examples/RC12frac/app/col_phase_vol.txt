@@ -1,0 +1,45 @@
+Name: col_phase_vol.txt
+Header: Phase Volumes:
+Format: prn
+Padding: '0.0'
+
+File: System_main_tbl.txt
+Table: System
+Columns: index Pressure Temperature
+
+File: Phase_main_tbl.txt
+Table: liquid1
+Columns: V
+
+File: Phase_main_tbl.txt
+Table: clinopyroxene1
+Columns: V
+
+File: Phase_main_tbl.txt
+Table: clinopyroxene2
+Columns: V
+
+File: Phase_main_tbl.txt
+Table: clinopyroxene3
+Columns: V
+
+File: Phase_main_tbl.txt
+Table: fluid1
+Columns: V
+
+File: Phase_main_tbl.txt
+Table: olivine1
+Columns: V
+
+File: Phase_main_tbl.txt
+Table: plagioclase1
+Columns: V
+
+File: Phase_main_tbl.txt
+Table: spinel1
+Columns: V
+
+File: Phase_main_tbl.txt
+Table: tridymite1
+Columns: V
+

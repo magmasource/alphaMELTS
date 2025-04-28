@@ -1,0 +1,25 @@
+Title: KM0417_RC12
+Initial Composition: SiO2 51.27
+Initial Composition: TiO2 0.96
+Initial Composition: Al2O3 14.80
+Initial Composition: Fe2O3 1.1
+Initial Composition: Cr2O3 0.042
+Initial Composition: FeO 8.70
+Initial Composition: MnO 0.176
+Initial Composition: MgO 8.45
+Initial Composition: NiO 0.011
+Initial Composition: CaO 12.47
+Initial Composition: Na2O 2.25
+Initial Composition: K2O 0.047
+Initial Composition: P2O5 0.065
+Initial Composition: H2O 0.25
+Initial Composition: CO2 0.005
+Initial Pressure: 250
+Final Pressure: 250
+Increment Pressure: 0
+Initial Temperature: 1191
+Final Temperature: 600
+Increment Temperature: -1
+Log fO2 Path: -1FMQ
+Mode: fractionate solids
+Output: both
