@@ -1,7 +1,0 @@
-
-! <><> alphaMELTS run by psmith <><> 
-! Time started: Feb 17 2023 at 12:15 
-
-! Command line: -b temp.txt 
-
-! Batch file used: temp.txt 

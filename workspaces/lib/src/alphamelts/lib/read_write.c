@@ -1202,7 +1202,8 @@ int putOutputDataToFile(char *fileName)
   printf("Current state of the system recorded in melts.out and .tbl files.\n");
   return TRUE;
 #else
-  if(!fflush(NULL)) fprintf(stderr, "Output files flushed."); else fprintf(stderr, "Error returned when attempting to flush output files.");
+  if(!fflush(NULL)) fprintf(stderr, "Output files flushed. ");
+  else fprintf(stderr, "Error returned when attempting to flush output files. ");
   fprintf(stderr, " Current state of the system recorded in file melts.out.\n");
   return TRUE;
 #endif
@@ -1951,6 +1952,9 @@ int putSequenceDataToXmlFile(int active) {
       rc = xmlTextWriterEndDocument(writer);
       xmlFreeTextWriter(writer);
     */
+
+    if(!xmlTextWriterFlush(writer)) fprintf(stderr, "XML files flushed.\n");
+    else fprintf(stderr, "Error returned when attempting to flush XML files.\n");
 
     free (outputFile);
     free (temporary);
