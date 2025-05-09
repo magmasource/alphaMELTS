@@ -1,10 +1,17 @@
-[tool.poetry]
+[project]
 name = "alphamelts"
-version = "0.1.0"
+dynamic = ["version", "classifiers"]
 description = ""
 authors = []
 readme = "README.md"
 packages = []
+
+[project.urls]
+repository = "https://github.com/magmasource/alphaMELTS/"
+"Bug Tracker" = "https://github.com/magmasource/alphaMELTS/issues"
+
+[tool.poetry]
+version = "2.4" # base version
 
 [tool.poetry.group.main.dependencies]
 python = "^3.10"
