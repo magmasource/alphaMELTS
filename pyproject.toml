@@ -1,39 +1,20 @@
 [project]
 name = "alphamelts"
-dynamic = ["version", "classifiers"]
+version = "2.4.0"
 description = ""
-authors = []
+authors = [
+    {name = "Paula Antoshechkina",email = "psmith@caltech.edu"}
+]
 readme = "README.md"
-packages = []
+requires-python = ">=3.10,<4.0"
+dependencies = [
+    "setuptools-cpp (>=0.1.0,<0.2.0)"
+]
 
 [project.urls]
 repository = "https://github.com/magmasource/alphaMELTS/"
 "Bug Tracker" = "https://github.com/magmasource/alphaMELTS/issues"
 
-[tool.poetry]
-version = "2.4" # base version
-
-[tool.poetry.group.main.dependencies]
-python = "^3.10"
-
-[tool.poetry.group.app.dependencies]
-alphamelts-app = { path = "workspaces/app", develop = true}
-
-[tool.poetry.group.lib.dependencies]
-alphamelts-lib = { path = "workspaces/lib", develop = true}
-
-[tool.poetry.group.lib-test.dependencies]
-alphamelts-lib = { path = "workspaces/lib", develop = true, extras=["test"]}
-
-[tool.poetry.group.cli.dependencies]
-alphamelts-cli = { path = "workspaces/cli", develop = true}
-
-[tool.poetry.group.mat.dependencies]
-alphamelts-mat = { path = "workspaces/mat", develop = true}
-
-[tool.poetry.group.py.dependencies]
-alphamelts-py  = { path = "workspaces/py",  develop = true}
-
 [build-system]
-requires = ["poetry-core", "setuptools", "setuptools-cpp"]
+requires = ["poetry-core>=2.0.0,<3.0.0", "setuptools", "setuptools-cpp"]
 build-backend = "poetry.core.masonry.api"
