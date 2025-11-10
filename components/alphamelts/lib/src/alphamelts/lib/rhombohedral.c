@@ -2224,10 +2224,10 @@ testRhm(int mask, double t, double p,
 
 void
 conRhm(int inpMask, int outMask, double t, double p,
-    double *e,      /* comp of ortho oxides in moles of elements                  */
-    double *m,      /* comp of ortho oxides in moles of endmember components      */
-    double *r,      /* comp of ortho oxides in terms of the independent comp var  */
-    double *x,      /* comp of ortho oxides in mole fractions of endmember comp   */
+    double *e,      /* comp of rhm oxides in moles of elements                  */
+    double *m,      /* comp of rhm oxides in moles of endmember components      */
+    double *r,      /* comp of rhm oxides in terms of the independent comp var  */
+    double *x,      /* comp of rhm oxides in mole fractions of endmember comp   */
     double **dm,    /* Jacobian matrix: dm[i][j] = dr[i]/dm[j]                  */
     double ***d2m,  /* vector of matrices: d2m[i][j][k] = d2r[i]/dm[j]dm[k]     */
     double **dr,    /* Jacobian matrix: dr[i][j] = dx[i]/dr[j]                  */
@@ -2243,7 +2243,7 @@ conRhm(int inpMask, int outMask, double t, double p,
     (3)  THIRD            FOURTH | SEVENTH
 
     (1) converts a vector of moles of elements into a vector of moles of
-            endmember ortho oxides components.
+            endmember rhm oxides components.
     (2) calculates from a vector of moles of endmember components, one or
             all of: r[], x[], dr[]/dm[] d2r[]/dm[]dm[], or d3r[]/dm[]dm[]dm[]
     (3) calculates from a vector of independent compositional variables
@@ -2251,7 +2251,7 @@ conRhm(int inpMask, int outMask, double t, double p,
             dx[]/dr[]
 
     In this routine it is assumed that the elements are in the order of atomic
-    numbers and that the order of ortho oxides components has been verified as:
+    numbers and that the order of rhm oxides components has been verified as:
             m[0] = geikielite  (MgTiO3) ,
             m[1] = hematite    (Fe2O3),
             m[2] = ilmenite    (FeTiO3),

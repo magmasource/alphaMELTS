@@ -1393,10 +1393,10 @@ testNph(int mask, double t, double p,
 
 void
 conNph(int inpMask, int outMask, double t, double p,
-    double *e,      /* comp of spinel in moles of elements                      */
-    double *m,      /* comp of spinel in moles of endmember components          */
-    double *r,      /* comp of spinel in terms of the independent comp var      */
-    double *x,      /* comp of spinel in mole fractions of endmember comp       */
+    double *e,      /* comp of nepheline in moles of elements                      */
+    double *m,      /* comp of nepheline in moles of endmember components          */
+    double *r,      /* comp of nepheline in terms of the independent comp var      */
+    double *x,      /* comp of nepheline in mole fractions of endmember comp       */
     double **dm,    /* Jacobian matrix: dm[i][j] = dr[i]/dm[j]                  */
     double ***d2m,  /* vector of matrices: d2m[i][j][k] = d2r[i]/dm[j]dm[k]     */
     double **dr,    /* Jacobian matrix: dr[i][j] = dx[i]/dr[j]                  */
@@ -1412,7 +1412,7 @@ conNph(int inpMask, int outMask, double t, double p,
     (3)  THIRD            FOURTH | SEVENTH
 
     (1) converts a vector of moles of elements into a vector of moles of
-            endmember spinel components.
+            endmember nepheline components.
     (2) calculates from a vector of moles of endmember components, one or
             all of: r[], x[], dr[]/dm[], d2r[]/dm[]dm[], or d3r[]/dm[]dm[]dm[]
     (3) calculates from a vector of independent compositional variables

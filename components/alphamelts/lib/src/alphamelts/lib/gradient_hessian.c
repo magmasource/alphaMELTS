@@ -528,7 +528,7 @@ int getProjGradientAndHessian(int conRows, int conCols, double ***eMatrixPt,
         for (i=0; i<(nlc-1); i++) matrix_free(d2rdm2Liq[i], nlc, nlc);
         free(d2rdm2Liq);
         matrix_free(drdmLiq, nlc-1, nlc);
-        vector_free(rLiq, nlc-2);
+        vector_free(rLiq, nlc-1);
         if (dpMixTmp  != (double *)  NULL) vector_free(dpMixTmp,  nlc-1);
         if (dpMixCon  != (double *)  NULL) vector_free(dpMixCon,  nlc-1);
         if (d2pMixTmp != (double **) NULL) matrix_free(d2pMixTmp, nlc-1, nlc-1);
@@ -1552,7 +1552,7 @@ int getProjGradientAndHessian(int conRows, int conCols, double ***eMatrixPt,
     if (H2Obuffer) {
         matrix_free(dmuH2Odm, silminState->nLiquidCoexist, nlc);
         for (i=0; i<conCols; i++) for (j=0; j<conCols; j++) eMatrix[i][j] += constraints->lambdaH2O*eMatrixH2O[i][j];
-        matrix_free(eMatrixH2O, conCols-1, conCols-1);
+        matrix_free(eMatrixH2O, conCols, conCols);
     }
 #endif
     if (silminState->fo2Path != FO2_NONE) {
@@ -1572,7 +1572,7 @@ int getProjGradientAndHessian(int conRows, int conCols, double ***eMatrixPt,
     }
 #endif
 
-            matrix_free(eMatrixfO2[nl], conCols-1, conCols-1);
+            matrix_free(eMatrixfO2[nl], conCols, conCols);
         }
         free(eMatrixfO2);
     }
@@ -1594,7 +1594,7 @@ int getProjGradientAndHessian(int conRows, int conCols, double ***eMatrixPt,
     }
 #endif
 
-        matrix_free(eMatrixT, conCols-1, conCols-1);
+        matrix_free(eMatrixT, conCols, conCols);
     } else if (isentropic) {
         colRow++;
         for (i=0; i<conCols; i++) for (j=0; j<conCols; j++) eMatrix[i][j] += constraints->lambdaS*eMatrixT[i][j];
@@ -1612,7 +1612,7 @@ int getProjGradientAndHessian(int conRows, int conCols, double ***eMatrixPt,
     }
 #endif
 
-        matrix_free(eMatrixT, conCols-1, conCols-1);
+        matrix_free(eMatrixT, conCols, conCols);
     } else if (isochoric) {
         colRow++;
         for (i=0; i<conCols; i++) for (j=0; j<conCols; j++) eMatrix[i][j] += constraints->lambdaV*eMatrixP[i][j];
@@ -1630,7 +1630,7 @@ int getProjGradientAndHessian(int conRows, int conCols, double ***eMatrixPt,
     }
 #endif
 
-        matrix_free(eMatrixP, conCols-1, conCols-1);
+        matrix_free(eMatrixP, conCols, conCols);
     }
 
     /*****************************************************************************************************

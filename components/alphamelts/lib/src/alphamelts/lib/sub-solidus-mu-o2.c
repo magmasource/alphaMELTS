@@ -242,10 +242,10 @@ int subsolidusmuO2(int mask,
             return TRUE;
         }
 
-        oxide      = (int *)    calloc((size_t) nc+1,sizeof(int));
-        phaseIndex = (int *)    calloc((size_t) n, sizeof(int));
-        nCoexist   = (int *)    calloc((size_t) n, sizeof(int));
-        RHS        = (double *) calloc((size_t) (nc+1),sizeof(double));
+        oxide      = (int *)    calloc((size_t) nc+1, sizeof(int));
+        phaseIndex = (int *)    calloc((size_t) n,    sizeof(int));
+        nCoexist   = (int *)    calloc((size_t) n,    sizeof(int));
+        RHS        = (double *) calloc((size_t) nc+1, sizeof(double));
 
         /* Construct reduced stoichiometry matrix -- rows for included oxide
             components plus oxygen, columns for phase-components present
@@ -295,7 +295,7 @@ int subsolidusmuO2(int mask,
 
             for (j=1, stMatrix[0][0]=1.0; j<n; j++) stMatrix[0][j] = 0.0;
             for (i=1; i<mm; i++) stMatrix[i][0] = 0.0;
-            for (i=1; i<mm; i++) for (j=0; j<n; j++) stMatrix[i][j] = solids[phaseIndex[j]].solToOx[oxide[i]];
+            for (i=1; i<mm; i++) for (j=1; j<n; j++) stMatrix[i][j] = solids[phaseIndex[j]].solToOx[oxide[i]];
 
             /* If FeO and Fe2O3 are both nonzero in the bulk composition,
                 weight the solToOx matrix to emphasize abundant components,
@@ -403,7 +403,7 @@ int subsolidusmuO2(int mask,
                     j=phaseIndex[i]; while(solids[--j].type != PHASE);
                     dadr = matrix_alloc(solids[j].na, solids[j].nr);
                     drdm = matrix_alloc(solids[j].nr, solids[j].na);
-                    for (k=0;k<solids[j].na;k++) {
+                    for (k=0; k<solids[j].na; k++) {
                         gibbs(silminState->T, silminState->P, (char *) solids[j+1+k].label, &(solids[j+1+k].ref), NULL, NULL, &(solids[j+1+k].cur));
                         m[k] = silminState->solidComp[j+1+k][nCoexist[i]];
                     }
@@ -448,7 +448,7 @@ int subsolidusmuO2(int mask,
                         printf("...subsolidusfO2: In while loop, Failure for oxygen.\n");
 #endif
                     }
-                    // This was 'i<n' in previous versions (should have been 'i<=n'?)
+                    // This was 'i<n' in previous NR versions (should have been 'i<=n'?)
                     for (i=1; i<n; i++) silminState->solidComp[phaseIndex[i]][nCoexist[i]] += xi * dstoich[i];
                     for (i=0; i<npc; i++) { /* recompute phase abundance, check phases */
                         if (solids[i].type == PHASE) {
@@ -464,7 +464,7 @@ int subsolidusmuO2(int mask,
                                 for (k=0; k<silminState->nSolidCoexist[i]; k++) {
                                     for (silminState->solidComp[i][k]=0.0, j=0; j<solids[i].na; j++)
                                         silminState->solidComp[i][k] += (mmm[j] = silminState->solidComp[i+1+j][k]);
-                                    if (!(*solids[i].test)(SIXTH, silminState->T,silminState->P, solids[i].na, solids[i].nr, NULL, NULL, NULL, mmm)) {
+                                    if (!(*solids[i].test)(SIXTH, silminState->T, silminState->P, solids[i].na, solids[i].nr, NULL, NULL, NULL, mmm)) {
                                         acceptable = FALSE;
 #ifdef DEBUG
                                         printf("...subsolidusfO2: In while loop, Failure for phase %s.\n", solids[i].label);
@@ -493,7 +493,7 @@ int subsolidusmuO2(int mask,
                     }
                     if (acceptable == FALSE) {    /* went too far, undo */
                         molesO2 += xi;
-                        // This was 'i<n' in previous versions (should have been 'i<=n'?)
+                        // This was 'i<n' in previous NR versions (should have been 'i<=n'?)
                         for (i=1; i<n; i++) silminState->solidComp[phaseIndex[i]][nCoexist[i]] -= xi * dstoich[i];
                         xi /= 2.0;  /* On next attempt, step half as far */
 #ifdef DEBUG
@@ -622,11 +622,11 @@ int subsolidusmuO2(int mask,
                 } else { /* reactant is a component -- step backwards to find phase */
                     double mTotal, vmix, *dvmixdrj, **drdm;
 
-                    j=phaseIndex[i]; while(solids[--j].type != PHASE);
+                    j = phaseIndex[i]; while(solids[--j].type != PHASE);
                     dvmixdrj = vector_alloc(solids[j].nr);
                     drdm     = matrix_alloc(solids[j].nr, solids[j].na);
 
-                    for (k=0,mTotal=0.0; k<solids[j].na; k++) {
+                    for (k=0, mTotal=0.0; k<solids[j].na; k++) {
                         gibbs(silminState->T, silminState->P, (char *) solids[j+1+k].label, &(solids[j+1+k].ref), NULL, NULL, &(solids[j+1+k].cur));
                         mTotal += (m[k] = (silminState->solidComp)[j+1+k][nCoexist[i]]);
                     }
@@ -694,8 +694,8 @@ int subsolidusmuO2(int mask,
                                     double temp_o, temp_p;
                                     for (q=1; q<n; q++) {
                                         if (phaseIndex[q] - j <= solids[j].na && phaseIndex[q]>j && nCoexist[q]==nCoexist[i]) {
-                                            for (l=0,d3gmixdm3[i+z][k][q]=0.0;l<solids[j].nr;l++) {
-                                                for (o=0,temp_o=0.0; o<solids[j].nr; o++) {
+                                            for (l=0, d3gmixdm3[i+z][k][q]=0.0; l<solids[j].nr; l++) {
+                                                for (o=0, temp_o=0.0; o<solids[j].nr; o++) {
                                                     for (p=0, temp_p=0.0; p<solids[j].nr; p++) temp_p += drdm[p][phaseIndex[k]-j-1] * d3gmixdr3[p][o][l];
                                                     temp_o += mTotal*((d2rdm2[o][phaseIndex[q]-j-1][phaseIndex[k]-j-1]
                                                             *drdm[l][y] + d2rdm2[l][y][phaseIndex[k]-j-1]
@@ -764,7 +764,7 @@ int subsolidusmuO2(int mask,
                     }
                     (*solids[j].convert)(SECOND, THIRD | FIFTH | SIXTH, silminState->T, silminState->P, NULL, m, r, NULL, drdm, d2rdm2, NULL, NULL);
                     (*solids[j].smix)(SECOND | THIRD, silminState->T, silminState->P, r, NULL, dsmixdr, d2smixdr2);
-                    for (y=0,z=0; y<solids[j].na; y++) {
+                    for (y=0, z=0; y<solids[j].na; y++) {
                         if (phaseIndex[i+z] == j+1+y && nCoexist[i+z] == nCoexist[i]) {
                             /* intensive dr to extensive dm conversion;
                             d2smixdm2[i][k] is zero if k or i are from other phases */
