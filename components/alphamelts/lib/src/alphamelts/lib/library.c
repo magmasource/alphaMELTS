@@ -515,7 +515,7 @@ typedef struct _nodeList {
     SilminState *silminState;
 } NodeList;
 static NodeList *nodeList;
-static int numberNodes;
+static int numberNodes = 0;
 
 static int compareNodes(const void *aPt, const void *bPt) {
     NodeList *a = (NodeList *) aPt;
@@ -1653,7 +1653,7 @@ void meltsgetphaseproperties_(char *phaseName, double *temperature,
 
             for (i=0; i<nc; i++) {
                 phaseProperties[11+i] = 0.0;
-                for (j=0; j<nlc; j++) phaseProperties[11+i] += (liquid[j].liqToOx)[i]*m[j]*bulkSystem[i].mw;
+                for (k=0; k<nlc; k++) phaseProperties[11+i] += (liquid[k].liqToOx)[i]*m[k]*bulkSystem[i].mw;
             }
             totalMoles = mTot;
 

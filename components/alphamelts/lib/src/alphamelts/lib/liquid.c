@@ -7886,7 +7886,7 @@ conLiq(int inpMask, int outMask, double t, double p,
     liqERRstate = ERR_NONE;
 
 #if defined(PHMELTS_ADJUSTMENTS) && ! defined(TRUE_xMELTS)
-    if ((silminState->fo2Alt) && (calculationMode != MODE_xMELTS)) {
+    if ((silminState != NULL) && (silminState->fo2Alt) && (calculationMode != MODE_xMELTS)) {
         //      conLiq_Alt(inpMask, outMask, t, p, o, m, r, x, dm, d2m, logfo2);
             return;
     } else
