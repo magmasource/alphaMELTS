@@ -260,6 +260,7 @@ const char *silmin_ver(void) { return "$Id: silmin.c,v 1.12 2009/04/24 20:51:09 
 #include <Xm/ToggleBG.h>
 #include "interface.h"            /*Specific external declarations          */
 #else
+#include <gsl/gsl_errno.h>
 #include "status.h"               /*Status of calculation in batch mode     */
 #endif
 
@@ -315,10 +316,6 @@ SilminState *bestState = NULL;
  * Global variables needed in Magma Chamber Simulator / standalone Melts-batch
  * to mimic webservices output
  */
-#ifdef BATCH_VERSION
-extern SilminState *previousSilminState;
-SilminState *previousSilminState;
-#endif
 
 /*
  *=============================================================================
@@ -452,6 +449,7 @@ int silmin(void)
 
     /*updateStatusADB(STATUS_ADB_INDEX_PHASE, &curStep);*/
 #else /* BATCH_VERSION */
+    (void) gsl_set_error_handler_off();
     if (curStep == 0) curStep = CHANGE_COMPOSITION;
 #endif /* BATCH_VERSION */
 
@@ -664,10 +662,10 @@ int silmin(void)
         case ADD_PHASE:
 
             /* Note: The storage (silminState->ySol)[0:npc-1] must contain results set by the
-       previous call to evaluateSaturationState. The space may be
-       reused upon exit from this case.  If liquid is absent, (silminState->yLiq)[0:nlc-1]
-       should contain results for liquid.  SilminState->incSolids[npc] is
-       used to store inclusion or suppression of liquid phase.          */
+            previous call to evaluateSaturationState. The space may be
+            reused upon exit from this case.  If liquid is absent, (silminState->yLiq)[0:nlc-1]
+            should contain results for liquid.  SilminState->incSolids[npc] is
+            used to store inclusion or suppression of liquid phase.          */
 
             if (hasSupersaturation) {
                 double minAffinity = 0.0;
@@ -1263,9 +1261,20 @@ int silmin(void)
 
             /* New code to save best iteration that meets non-optimal criteria */
             if (rNorm < sqrt(DBL_EPSILON)*sNorm && rNorm < bestrNorm) {
+                int fractionateSol = silminState->fractionateSol, fractionateFlu = silminState->fractionateFlu,
+                    fractionateLiq = silminState->fractionateLiq;
+                silminState->fractionateSol = FALSE;
+                silminState->fractionateFlu = FALSE;
+                silminState->fractionateLiq = FALSE;
+
                 bestrNorm = rNorm; bestIter = iterQuad;
                 acceptable = TRUE;
                 bestState = copySilminStateStructure(silminState, bestState);
+
+                silminState->fractionateSol = fractionateSol;
+                silminState->fractionateFlu = fractionateFlu;
+                silminState->fractionateLiq = fractionateLiq;
+
             }
 
 #ifndef BATCH_VERSION
@@ -1290,6 +1299,12 @@ int silmin(void)
                     fprintf(stderr, "...Quadratic convergence accepted, but non-optimal.\n");
 #endif
                 } else if (acceptable) {
+                    int fractionateSol = silminState->fractionateSol, fractionateFlu = silminState->fractionateFlu,
+                        fractionateLiq = silminState->fractionateLiq;
+                    silminState->fractionateSol = FALSE;
+                    silminState->fractionateFlu = FALSE;
+                    silminState->fractionateLiq = FALSE;
+
                     curStep = CONVERGENCE_TEST;
 #ifndef BATCH_VERSION
                     wprintf(statusEntries[STATUS_ADB_INDEX_STATUS].name, "...Quadratic convergence was acceptable at iterQuad = %d (rNorm = %g).\n", bestIter, bestrNorm);
@@ -1299,6 +1314,11 @@ int silmin(void)
                     fprintf(stderr, "...Quadratic convergence was acceptable at iterQuad = %d (rNorm = %g).\n", bestIter, bestrNorm);
 #endif
                     silminState = copySilminStateStructure(bestState, silminState);
+
+                    silminState->fractionateSol = fractionateSol;
+                    silminState->fractionateFlu = fractionateFlu;
+                    silminState->fractionateLiq = fractionateLiq;
+
                 } else {
 #ifndef BATCH_VERSION
                     XmString csString1, csString2, csString3;
@@ -2037,25 +2057,25 @@ int silmin(void)
 
 #ifdef PHMELTS_ADJUSTMENTS
 
-    /* Reset fracSComp and fracLComp (previousState is used for accumulation instead) */
-    if (silminState->fractionateSol || silminState->fractionateFlu || silminState->fractionateLiq) (silminState->fracMass) = 0.0;
-    if ((silminState->fractionateSol || silminState->fractionateFlu) && silminState->fracSComp != NULL) {
-        for (i=0; i<npc; i++) if (solids[i].type == PHASE) {
-            if ((silminState->nFracCoexist)[i] > 0) {
-                int nf = (silminState->nFracCoexist)[i];
-                for (j=0; j<nf; j++) (silminState->fracSComp)[i][j] = 0.0;
-                if (solids[i].na > 1) for (j=0; j<solids[i].na; j++) {
-                    for (k=0; k<nf; k++) (silminState->fracSComp)[i+1+j][k] = 0.0;
+            /* Reset fracSComp and fracLComp (previousState is used for accumulation instead) */
+            if (silminState->fractionateSol || silminState->fractionateFlu || silminState->fractionateLiq) (silminState->fracMass) = 0.0;
+            if ((silminState->fractionateSol || silminState->fractionateFlu) && silminState->fracSComp != NULL) {
+                for (i=0; i<npc; i++) if (solids[i].type == PHASE) {
+                    if ((silminState->nFracCoexist)[i] > 0) {
+                        int nf = (silminState->nFracCoexist)[i];
+                        for (j=0; j<nf; j++) (silminState->fracSComp)[i][j] = 0.0;
+                        if (solids[i].na > 1) for (j=0; j<solids[i].na; j++) {
+                            for (k=0; k<nf; k++) (silminState->fracSComp)[i+1+j][k] = 0.0;
+                        }
+                    }
                 }
             }
-        }
-    }
-    if (silminState->fractionateLiq && silminState->fracLComp != NULL) {
-        /* SEPARATE OUT MULTIPLE LIQUIDS (JUST LIKE SOLIDS) */
-        for (i=0; i<nlc; i++) {
-            (silminState->fracLComp)[i] = 0.0;
-        }
-    }
+            if (silminState->fractionateLiq && silminState->fracLComp != NULL) {
+                /* SEPARATE OUT MULTIPLE LIQUIDS (JUST LIKE SOLIDS) */
+                for (i=0; i<nlc; i++) {
+                    (silminState->fracLComp)[i] = 0.0;
+                }
+            }
 
             if (silminState->txtOutput != TEXT_NONE && silminState->txtOutput < TEXT_ALPHA_0) {
                 if ((silminState->fractionateSol || silminState->fractionateFlu) && silminState->fracSComp == NULL) {
@@ -2066,9 +2086,9 @@ int silmin(void)
                     silminState->fracLComp = (double *) calloc((unsigned) nlc, sizeof(double));
                 }
                 /* NOT NEEDED? */
-                if  ((silminState->fractionateSol || silminState->fractionateFlu || silminState->fractionateLiq) && previousSilminState == NULL) {
+                /*if  ((silminState->fractionateSol || silminState->fractionateFlu || silminState->fractionateLiq) && previousSilminState == NULL) {
                     previousSilminState = copySilminStateStructure(silminState, previousSilminState);
-                }
+                }*/
 
 
 
@@ -2097,14 +2117,15 @@ int silmin(void)
             /* ------------------------------------------------------------------------ */
         case UPDATE_SYSTEM:
 
-#ifndef PHMELTS_ADJUSTMENTS
-
 #ifndef BATCH_VERSION
             if (oldErrorHandler != NULL && signal(SIGFPE, oldErrorHandler) == SIG_ERR)
                 wprintf(statusEntries[STATUS_ADB_INDEX_STATUS].name, "...Error in installing old signal handler.\n");
             oldErrorHandler = NULL;
+#else
+            (void) gsl_set_error_handler(NULL);
 #endif
 
+#ifndef PHMELTS_ADJUSTMENTS
             /* Solid Phase Fractionation */
 #ifndef BATCH_VERSION
             if ((silminState->fractionateSol || silminState->fractionateFlu) && !hasLiquid) wprintf(statusEntries[STATUS_ADB_INDEX_STATUS].name,

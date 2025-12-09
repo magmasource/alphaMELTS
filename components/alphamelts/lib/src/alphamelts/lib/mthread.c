@@ -54,7 +54,7 @@ char *threadList[MAX_CONNECTION_THREADS];
 
 struct MTHREAD_KEY {
   long count;
-  void (*destructor)();
+  void (*destructor)(void *);
   void *specific_data[MAX_CONNECTION_THREADS];
 };
 

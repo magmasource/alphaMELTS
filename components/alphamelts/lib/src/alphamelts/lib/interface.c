@@ -181,7 +181,7 @@ const char *interface_ver(void) { return "$Id: interface.c,v 1.13 2009/05/14 04:
 #else
 /* BATCH_VERSION */
 
-extern SilminState *previousSilminState;
+static SilminState *previousSilminState;
 
 #define REALLOC(x, y) (((x) == NULL) ? malloc(y) : realloc((x), (y)))
 #define REC 134

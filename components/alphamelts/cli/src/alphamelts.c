@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#ifdef WINDOWS
+#ifdef USEEDITLINE
 #include <editline/readline.h>
 #else
 #include <readline/history.h>
@@ -91,11 +91,13 @@ int main(int argc, char** argv) {
         printf("ALPHAMELTS_CALC_MODE not set!\n\n");
         while (!mode) {
 
+            //                       11111111112222222222333333333344444444445555555555666666666677777777778888888888
             if ((menubuf = readline("---> Default calculation mode is rhyolite-MELTS (v. 1.0.2).  Change this? (y or n): ")) != NULL
                     && strlen(menubuf) > 0) add_history(menubuf);
 
             if (tolower(menubuf[0]) == 'y') {
                 if (ilog) fprintf(logfile, "%s\n", menubuf); free(menubuf);
+                //                       11111111112222222222333333333344444444445555555555666666666677777777778888888888
                 if ((menubuf = readline("     Set calculation mode to rhyolite-MELTS (public release v 1.1.0)? (y or n): ")) != NULL
                         && strlen(menubuf) > 0) add_history(menubuf);
                 if (tolower(menubuf[0]) == 'y') { mode = MODE__MELTSandCO2; break; }

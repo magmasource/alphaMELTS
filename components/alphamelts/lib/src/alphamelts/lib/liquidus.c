@@ -305,17 +305,17 @@ int findWetLiquidus(void) {
         printf("<><><><> !!! <><><><> Unable to locate (Wet) liquidus with solids/multiple liquids present.\n");
     }
     else {
-      dspTstart = silminState->dspTstart;
-      dspTstop  = silminState->dspTstop;
-      dspTinc   = silminState->dspTinc;
-      do {
+        dspTstart = silminState->dspTstart;
+        dspTstop  = silminState->dspTstop;
+        dspTinc   = silminState->dspTinc;
+        do {
             oldT = silminState->T;
             for (i=0, j=0; i<npc; i++) if ((solids[i].type == PHASE) && (solids[i].nr == 0 || (solids[i].nr > 0 && solids[i].convert != NULL))) {
-                    oldIncSolids[j] = (silminState->incSolids)[j];
-                    (silminState->incSolids)[j] = FALSE;
-                    if (!strcmp("fluid", solids[i].label)) (silminState->incSolids)[j] = TRUE;
-                    j++;
-                }
+                oldIncSolids[j] = (silminState->incSolids)[j];
+                (silminState->incSolids)[j] = FALSE;
+                if (!strcmp("fluid", solids[i].label)) (silminState->incSolids)[j] = TRUE;
+                j++;
+            }
             silminState->dspTstart   = oldT;
             silminState->dspTstop    = oldT;
             silminState->dspTinc     = 0.0;

@@ -532,36 +532,34 @@ SilminState *copySilminStateStructure(SilminState *pOld, SilminState *pNew)
             }
         }
 
-        if ((pOld->fractionateSol || pOld->fractionateFlu) && (pOld->nFracCoexist != NULL) && (pOld->fracSComp != NULL)) {
+        if (pOld->fractionateSol || pOld->fractionateFlu) {
             pNew->fracSComp    = (double **) calloc((unsigned) npc, sizeof(double *));
             pNew->nFracCoexist = (int *)     calloc((unsigned) npc, sizeof(int));
-            for (i=0; i<npc; i++) {
-                (pNew->nFracCoexist)[i] = (pOld->nFracCoexist)[i];
-                if ((ns = (pOld->nFracCoexist)[i]) > 0) {
-                    (pNew->fracSComp)[i]  = (double *) malloc((unsigned) ns*sizeof(double));
-                    for (j=0; j<ns; j++) (pNew->fracSComp)[i][j] = (pOld->fracSComp)[i][j];
-	  if (solids[i].na > 1) for (k=0; k<solids[i].na; k++) {
+            if ((pOld->nFracCoexist != NULL) && (pOld->fracSComp != NULL)) {
+                for (i=0; i<npc; i++) {
+                    (pNew->nFracCoexist)[i] = (pOld->nFracCoexist)[i];
+                    if ((ns = (pOld->nFracCoexist)[i]) > 0) {
+                        (pNew->fracSComp)[i]  = (double *) malloc((unsigned) ns*sizeof(double));
+                        for (j=0; j<ns; j++) (pNew->fracSComp)[i][j] = (pOld->fracSComp)[i][j];
+                        if (solids[i].na > 1) for (k=0; k<solids[i].na; k++) {
                             (pNew->fracSComp)[i+1+k]  = (double *) malloc((unsigned) ns*sizeof(double));
                             for (j=0; j<ns; j++) (pNew->fracSComp)[i+1+k][j] = (pOld->fracSComp)[i+1+k][j];
-	  }
+                        }
+                    }
                 }
             }
         }
 
-        if (pOld->fractionateLiq && (pOld->fracLComp != NULL)) {
+        if (pOld->fractionateLiq) {
             pNew->fracLComp = (double *) calloc((unsigned) nlc, sizeof(double));
-            for (i=0; i<nlc; i++) (pNew->fracLComp)[i] = (pOld->fracLComp)[i];
+            if (pOld->fracLComp != NULL) for (i=0; i<nlc; i++) (pNew->fracLComp)[i] = (pOld->fracLComp)[i];
         }
 
         if (pOld->assimilate) {
-            pNew->dspAssimComp
-                = (double **) calloc((unsigned) (npc+nc), sizeof(double *));
-            pNew->assimComp
-                = (double **) calloc((unsigned) (npc+nlc), sizeof(double *));
-            pNew->nDspAssimComp
-                = (int *)     calloc((unsigned) (npc+nc), sizeof(int));
-            pNew->nAssimComp
-                = (int *)     calloc((unsigned) (npc+nlc), sizeof(int));
+            pNew->dspAssimComp = (double **) calloc((unsigned) (npc+nc), sizeof(double *));
+            pNew->assimComp = (double **) calloc((unsigned) (npc+nlc), sizeof(double *));
+            pNew->nDspAssimComp = (int *)     calloc((unsigned) (npc+nc), sizeof(int));
+            pNew->nAssimComp = (int *)     calloc((unsigned) (npc+nlc), sizeof(int));
             for (i=0; i<(npc+nc); i++) {
                 (pNew->nDspAssimComp)[i] = (pOld->nDspAssimComp)[i];
                 if ((ns = (pOld->nDspAssimComp)[i]) > 0) {
@@ -612,13 +610,13 @@ SilminState *copySilminStateStructure(SilminState *pOld, SilminState *pNew)
                 int newSize = MAX((pOld->nSolidCoexist)[i], 1);
                 pNew->solidComp[i]  = (double *) realloc(pNew->solidComp[i], (unsigned) newSize*sizeof(double));
                 pNew->solidDelta[i] = (double *) realloc(pNew->solidDelta[i],(unsigned) newSize*sizeof(double));
-	if (solids[i].na > 1) {
-	  for (j=0; j<solids[i].na; j++) {
+	            if (solids[i].na > 1) {
+	                for (j=0; j<solids[i].na; j++) {
                         pNew->solidComp[i+1+j]  = (double *) realloc(pNew->solidComp[i+1+j], (unsigned) newSize*sizeof(double));
                         pNew->solidDelta[i+1+j] = (double *) realloc(pNew->solidDelta[i+1+j],(unsigned) newSize*sizeof(double));
-	  }
-	  i += solids[i].na;
-	}
+            	    }
+	                i += solids[i].na;
+	            }
             }
         }
 
@@ -685,24 +683,26 @@ SilminState *copySilminStateStructure(SilminState *pOld, SilminState *pNew)
 
 #endif
 
-        if ((pOld->fractionateSol || pOld->fractionateFlu) && (pOld->nFracCoexist != NULL) && (pOld->fracSComp != NULL)) {
+        if (pOld->fractionateSol || pOld->fractionateFlu) {
             if (pNew->nFracCoexist == NULL) {
                 pNew->fracSComp    = (double **) calloc((unsigned) npc, sizeof(double *));
                 pNew->nFracCoexist = (int *)     calloc((unsigned) npc, sizeof(int));
             }
-            for (i=0; i<npc; i++) {
-                if ((pNew->nFracCoexist)[i] != (pOld->nFracCoexist)[i]) {
-                    int newSize = MAX((pOld->nFracCoexist)[i], 1);
-                    pNew->fracSComp[i]  = (double *) REALLOC(pNew->fracSComp[i],(unsigned) newSize*sizeof(double));
-	        if (solids[i].na > 1) for (k=0; k<solids[i].na; k++) {
-	          pNew->fracSComp[i+1+k]  = (double *) REALLOC(pNew->fracSComp[i+1+k],(unsigned) newSize*sizeof(double));
-      	  }
+            if ((pOld->nFracCoexist != NULL) && (pOld->fracSComp != NULL)) {
+                for (i=0; i<npc; i++) {
+                    if ((pNew->nFracCoexist)[i] != (pOld->nFracCoexist)[i]) {
+                        int newSize = MAX((pOld->nFracCoexist)[i], 1);
+                        pNew->fracSComp[i]  = (double *) REALLOC(pNew->fracSComp[i],(unsigned) newSize*sizeof(double));
+                        if (solids[i].na > 1) for (k=0; k<solids[i].na; k++) {
+                            pNew->fracSComp[i+1+k]  = (double *) REALLOC(pNew->fracSComp[i+1+k],(unsigned) newSize*sizeof(double));
+                        }
+                    }
+                    if ((pOld->nFracCoexist)[i] > 0) for (j=0; j<(pOld->nFracCoexist)[i]; j++) {
+                        pNew->fracSComp[i][j] = pOld->fracSComp[i][j];
+                        if (solids[i].na > 1) for (k=0; k<solids[i].na; k++) pNew->fracSComp[i+1+k][j] = pOld->fracSComp[i+1+k][j];
+                    }
+                    (pNew->nFracCoexist)[i] = (pOld->nFracCoexist)[i];
                 }
-                if ((pOld->nFracCoexist)[i] > 0) for (j=0; j<(pOld->nFracCoexist)[i]; j++) {
-	        pNew->fracSComp[i][j] = pOld->fracSComp[i][j];
-                    if (solids[i].na > 1) for (k=0; k<solids[i].na; k++) pNew->fracSComp[i+1+k][j] = pOld->fracSComp[i+1+k][j];
-                }
-                (pNew->nFracCoexist)[i] = (pOld->nFracCoexist)[i];
             }
         } else if ((pNew->fractionateSol || pNew->fractionateFlu) && (pNew->nFracCoexist != NULL) && (pNew->fracSComp != NULL)) {
             for (i=0; i<npc; i++) if (pNew->fracSComp[i] != NULL) free (pNew->fracSComp[i]);
@@ -712,9 +712,9 @@ SilminState *copySilminStateStructure(SilminState *pOld, SilminState *pNew)
         pNew->fractionateSol = pOld->fractionateSol;
         pNew->fractionateFlu = pOld->fractionateFlu;
 
-        if (pOld->fractionateLiq && (pOld->fracLComp != NULL)) {
+        if (pOld->fractionateLiq) {
             if (pNew->fracLComp == NULL) pNew->fracLComp = (double *) calloc((unsigned) nlc, sizeof(double));
-            for (i=0; i<nlc; i++) pNew->fracLComp[i] = pOld->fracLComp[i];
+            if (pOld->fracLComp != NULL) for (i=0; i<nlc; i++) pNew->fracLComp[i] = pOld->fracLComp[i];
         } else if (pNew->fractionateLiq && (pNew->fracLComp != NULL)) {
             free(pNew->fracLComp);
             pNew->fracLComp = NULL;
