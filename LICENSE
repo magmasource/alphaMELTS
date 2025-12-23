@@ -663,15 +663,15 @@ For more information on this, and how to apply and follow the GNU AGPL, see
 
 _____________________________________________________
 
-**ADDITIONAL INFORMATION:**
+ADDITIONAL INFORMATION:
 
 While not technically part of the license requirements, we request that any publication using this software includes modified source code or a clear text explanation of any changes made that may affect model results. This may also be a requirement of the journal publisher.
 
 contact: psmith[at]gps.caltech.edu
 _____________________________________________________
 
-**Licenses of included software libraries**
-___________________________________________
+Licenses of included software libraries
+______________________________________________
 
 xMELTS (https://gitlab.com/ENKI-portal/xMELTS)
 ______________________________________________
@@ -689,16 +689,16 @@ Redistribution and use in source and binary forms, with or without modification,
  * Neither the name of Mark S. Ghiorso nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MARK S. GHIORSO BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGE (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-____________________________
+____________________________________________________________________
 
 GSL - The GNU Scientific Library (https://www.gnu.org/software/gsl/)
-____________________________
+____________________________________________________________________
 
 The GNU Scientific Library (GSL) is a numerical library for C and C++ programmers. It is free software under the GNU General Public License (https://www.gnu.org/licenses/gpl.html).
 
-____________________________
+_______________________________________________________________________________
 
 The GNU Readline Library (https://tiswww.cwru.edu/php/chet/readline/rltop.html)
-____________________________
+_______________________________________________________________________________
 
 The GNU Readline Library (GSL) that provides tools such as tab-completion, command history recall and editing. It is free software under the GNU General Public License (https://www.gnu.org/licenses/gpl.html).
