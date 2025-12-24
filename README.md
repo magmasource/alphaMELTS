@@ -2,8 +2,6 @@
 
 <img src="https://raw.githubusercontent.com/magmasource/alphaMELTS/main/docs/logo_final%20ellipse.png" alt="New alphaMELTS Logo" width="40%" align="right">
 
-[![DOI](https://zenodo.org/badge/724791740.svg)](https://zenodo.org/doi/10.5281/zenodo.11406234)
-
 alphaMELTS started as a text menu-driven interface to subroutine versions of the MELTS ([Ghiorso & Sack, 1995](http://dx.doi.org/10.1007/s004100050036)), pMELTS ([Ghiorso et al., 2002](http://dx.doi.org/10.1029/2001GC000217)), and pHMELTS ([Asimow et al., 2004](http://dx.doi.org/10.1029/2003GC000568)) models of thermodynamic equilibrium in silicate systems. Formerly known as 'Adiabat_1ph', and described in a software brief in G-cubed ([Smith & Asimow, 2005](http://dx.doi.org/10.1029/2004GC000816)), it evolved to 'alphaMELTS' via Adiabat_1ph &rarr; A1ph &rarr; Alph &rarr; alpha &rarr; alphaMELTS.
 
 alphaMELTS 2 was a complete rewrite incorporating the latest source code for Rhyolite-MELTS 1.0.2, 1.1.0 and 1.2.0 ([Gualda et al. 2012](https://doi.org/10.1093/petrology/egr080); [Ghiorso & Gualda, 2015](https://doi.org/10.1007/s00410-015-1141-8)) and the pMELTS model, as forked from the ENKI-portal on GitLab (see [xMELTS](https://gitlab.com/ENKI-portal/xMELTS)). The program is split into libraries of alphaMELTS functions and a text-based front-end to access them. The external interface (i.e. the menu options and files) of the alphamelts executable resembles the older version, but is more flexible and easier to use, with tab completion and command history / logging. alphaMELTS can be automated and called from the command line, or from scripts in MATLAB, Python or R.
@@ -37,7 +35,7 @@ Details of other changes will be listed in the GitHub Wiki and Changelog.
 
 ## Installation
 
-alphaMELTS has been repackaged so that users need only download the files needed for the interface (standalone app, MATLAB, or Python) and platform that they intend to use (Windows 10/11 PC, macOS Intel or Apple Silicon, or Linux PC). For now, the installation process for each interface is inherited from the separate packages / repositories and is documented in the [GitHub Wiki](https://github.com/magmasource/alphaMELTS/wiki). Click the drop down in the sidebar to the right to navigate to the correct set of instructions for installation and testing.
+alphaMELTS has been repackaged so that users need only download the files needed for the interface (standalone app, MATLAB, or Python) and the platform Windows 10/11, macOS, Linux) and processor they intend to use (e.g. x86_64 for PC or Intel Mac; arm64 / aarch64 for Apple Silicon Macs). For now, the installation process for each interface is inherited from the separate packages / repositories and is documented in the [GitHub Wiki](https://github.com/magmasource/alphaMELTS/wiki). Click the drop down in the sidebar to the right to navigate to the correct set of instructions for installation and testing.
 
 ## Notifications and Support
 
