@@ -16,7 +16,7 @@ alphaMELTS forms the base for MELTS calculations in [PetThermoTools](https://git
 
 ## Will I get the same results with alphaMELTS as other MELTS software?
 
-You can see the forked xMELTS code and early (alpha)MELTS for MATLAB development on GitHub. Separate Git repositories for alphaMELTS 2 and alphaMELTS for MATLAB/Python are archived on the MAGMA Source GitList server.
+You can see the forked xMELTS code and early (alpha)MELTS for MATLAB development on the main branch on GitHub. Separate Git repositories for alphaMELTS 2 and alphaMELTS for MATLAB/Python are archived on the MAGMA Source GitList server.
 * https://github.com/magmasource/MAGMA
 * https://magmasource.caltech.edu/gitlist/alphaMELTS2.git/ _now retired but available on request_
 * https://magmasource.caltech.edu/gitlist/MELTS_Matlab.git/ _now retired but available on request_
