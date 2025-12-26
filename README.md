@@ -6,7 +6,7 @@ alphaMELTS started as a text menu-driven interface to subroutine versions of the
 
 alphaMELTS 2 was a complete rewrite incorporating the latest source code for Rhyolite-MELTS 1.0.2, 1.1.0 and 1.2.0 ([Gualda et al. 2012](https://doi.org/10.1093/petrology/egr080); [Ghiorso & Gualda, 2015](https://doi.org/10.1007/s00410-015-1141-8)) and the pMELTS model, as forked from the ENKI-portal on GitLab (see [xMELTS](https://gitlab.com/ENKI-portal/xMELTS)). The program is split into libraries of alphaMELTS functions and a text-based front-end to access them. The external interface (i.e. the menu options and files) of the alphamelts executable resembles the older version, but is more flexible and easier to use, with tab completion and command history / logging. alphaMELTS can be automated and called from the command line, or from scripts in MATLAB, Python or R.
 
-Version 2.3.0 brings together standalone, MATLAB and Python versions that were previously posted and versioned in separate repositories. Source code for the underlying libalphaMELTS C library is available for browsing and an old Makefile is provided for reference. Workflows to build and package alphaMELTS interfaces on multiple platforms will be added soon, and comprehensive documentation and a software brief are upcoming.
+Version 2.3.0 brings together standalone, MATLAB and Python versions that were previously posted and versioned in separate repositories. Source code for the underlying C library of MELTS functions will be available for browsing in the [MAGMA](https://github.com/magmasource/MAGMA/pHMELTS) repository soon. Workflows to build and package alphaMELTS interfaces on multiple platforms will be added soon, and comprehensive documentation and a software brief are upcoming.
 
 ## How does alphaMELTS compare to other versions of MELTS?
 
@@ -18,8 +18,8 @@ alphaMELTS forms the base for MELTS calculations in [PetThermoTools](https://git
 
 You can see the forked xMELTS code and early (alpha)MELTS for MATLAB development on GitHub. Separate Git repositories for alphaMELTS 2 and alphaMELTS for MATLAB/Python are archived on the MAGMA Source GitList server.
 * https://github.com/magmasource/MAGMA
-* https://magmasource.caltech.edu/gitlist/alphaMELTS2.git/
-* https://magmasource.caltech.edu/gitlist/MELTS_Matlab.git/
+* https://magmasource.caltech.edu/gitlist/alphaMELTS2.git/ _now retired but available on request_
+* https://magmasource.caltech.edu/gitlist/MELTS_Matlab.git/ _now retired but available on request_
 
 The most noticeable difference between alphaMELTS and other MELTS software is that the feldspar phase has been separated into plagiocalse and alkali-feldspar to ease bookkeeping. All models use the pMELTS names for solid phases (i.e. no spaces in names). Some other changes include:
 
