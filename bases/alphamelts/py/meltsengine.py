@@ -354,7 +354,7 @@ class MELTSengine(object):
                     self.status.libalphamelts.setMeltsSystemProperties(pointer(failure), properties, pointer(nCharInString), pointer(nLinesInArray))
             else:
                 self.status.libalphamelts.setMeltsSystemProperties(pointer(failure), properties, pointer(nCharInString), pointer(nLinesInArray))
-            self.status.failed = failure.value
+            self.status.failed = (failure.value != 0)
         except OSError:
             print("OSERROR")
 
@@ -448,7 +448,7 @@ class MELTSengine(object):
             else:
                 self.status.libalphamelts.driveMeltsProcess(pointer(failure), pointer(runMode), pointer(pressure), bulk, pointer(reference), pointer(temperature), \
                     phases, pointer(nCharInName), pointer(numberPhases), pointer(outputFlag), errorString, pointer(nCharInString), properties, phaseIndices)
-            self.status.failed = failure.value
+            self.status.failed = (failure.value != 0)
             self.status.message = errorString.value.decode()
         except OSError:
             print("OSERROR")
@@ -599,8 +599,12 @@ class MELTSengine(object):
             temperature = c_double(self.temperature+273.15)
             pressure = c_double(self.pressure)
 
+
             phaseName = phaseList[i]
+            if phaseName.startswith('bulk'):
+                phaseName = 'liquid'
             phase = create_string_buffer(re.sub(r'(_+.*)|(\d*)', '', phaseName).encode())
+            model = create_string_buffer(('Shaw').encode())
             visc = c_double(0.0)
 
             self.status.failed = True
@@ -608,22 +612,18 @@ class MELTSengine(object):
             try:
                 if pipes is not None:
                     with pipes():
-                        if phaseName.startswith('bulk') or phaseName.startswith('liquid'):
-                            self.status.libalphamelts.getMeltsPhaseProperties(pointer(failure), 'liquid', pointer(temperature), pointer(pressure), bulk, properties)
-                            if failure is False:
-                                self.status.libalphamelts.getMeltsViscosity(pointer(failure), 'Shaw', pointer(temperature), bulk, pointer(visc))
-                        else:
-                            self.status.libalphamelts.getMeltsPhaseProperties(pointer(failure), phase, pointer(temperature), pointer(pressure), bulk, properties)
-                else:
-                    if phaseName.startswith('bulk') or phaseName.startswith('liquid'):
-                        self.status.libalphamelts.getMeltsPhaseProperties(pointer(failure), 'liquid', pointer(temperature), pointer(pressure), bulk, properties)
-                        if failure is False:
-                            self.status.libalphamelts.getMeltsViscosity(pointer(failure), 'Shaw', pointer(temperature), bulk, pointer(visc))
-                    else:
                         self.status.libalphamelts.getMeltsPhaseProperties(pointer(failure), phase, pointer(temperature), pointer(pressure), bulk, properties)
-                self.status.failed = failure.value
+                        if phaseName.startswith('liquid') and not failure.value:
+                            self.status.libalphamelts.getMeltsViscosity(pointer(failure), model, pointer(temperature), bulk, pointer(visc))
+                else:
+                    self.status.libalphamelts.getMeltsPhaseProperties(pointer(failure), phase, pointer(temperature), pointer(pressure), bulk, properties)
+                    if phaseName.startswith('liquid') and not failure.value:
+                        self.status.libalphamelts.getMeltsViscosity(pointer(failure), model, pointer(temperature), bulk, pointer(visc))
+                self.status.failed = (failure.value != 0)
             except OSError:
                 print("OSERROR")
+
+            phaseName = phaseList[i]
 
             if self.status.failed:
                 if self.status.reload("calcPhaseProperties"):
@@ -699,8 +699,12 @@ class MELTSengine(object):
             temperature = c_double(self.temperature+273.15)
             pressure = c_double(self.pressure)
 
+
             phaseName = phaseList[i]
+            if phaseName.startswith('bulk'):
+                phaseName = 'liquid'
             phase = create_string_buffer(re.sub(r'(_+.*)|(\d*)', '', phaseName).encode())
+            model = create_string_buffer(('Shaw').encode())
             visc = c_double(0.0)
 
             self.status.failed = True
@@ -708,22 +712,18 @@ class MELTSengine(object):
             try:
                 if pipes is not None:
                     with pipes():
-                        if phaseName.startswith('bulk') or phaseName.startswith('liquid'):
-                            self.status.libalphamelts.getMeltsMolarProperties(pointer(failure), 'liquid', pointer(temperature), pointer(pressure), bulk, properties)
-                            if failure is False:
-                                self.status.libalphamelts.getMeltsViscosity(pointer(failure), 'Shaw', pointer(temperature), bulk, pointer(visc))
-                        else:
-                            self.status.libalphamelts.getMeltsMolarProperties(pointer(failure), phase, pointer(temperature), pointer(pressure), bulk, properties)
-                else:
-                    if phaseName.startswith('bulk') or phaseName.startswith('liquid'):
-                        self.status.libalphamelts.getMeltsMolarProperties(pointer(failure), 'liquid', pointer(temperature), pointer(pressure), bulk, properties)
-                        if failure is False:
-                            self.status.libalphamelts.getMeltsViscosity(pointer(failure), 'Shaw', pointer(temperature), bulk, pointer(visc))
-                    else:
                         self.status.libalphamelts.getMeltsMolarProperties(pointer(failure), phase, pointer(temperature), pointer(pressure), bulk, properties)
-                self.status.failed = failure.value
+                        if phaseName.startswith('liquid') and not failure.value:
+                            self.status.libalphamelts.getMeltsViscosity(pointer(failure), model, pointer(temperature), bulk, pointer(visc))
+                else:
+                    self.status.libalphamelts.getMeltsMolarProperties(pointer(failure), phase, pointer(temperature), pointer(pressure), bulk, properties)
+                    if phaseName.startswith('liquid') and not failure.value:
+                        self.status.libalphamelts.getMeltsViscosity(pointer(failure), model, pointer(temperature), bulk, pointer(visc))
+                self.status.failed = (failure.value != 0)
             except OSError:
                 print("OSERROR")
+
+            phaseName = phaseList[i]
 
             if self.status.failed:
                 if self.status.reload("calcMolarProperties"):
@@ -803,6 +803,7 @@ class MELTSengine(object):
 
             phaseName = phaseList[i]
             phase = create_string_buffer(re.sub(r'(_+.*)|(\d*)', '', phaseName).encode())
+            model = create_string_buffer(('GRD').encode())
             visc = c_double(0.0)
 
             assert (phaseName.startswith('bulk') or phaseName.startswith('liquid')), "Phase is not liquid in viscosity calc?"
@@ -812,10 +813,10 @@ class MELTSengine(object):
             try:
                 if pipes is not None:
                     with pipes():
-                        self.status.libalphamelts.getMeltsViscosity(pointer(failure), 'GRD', pointer(temperature), bulk, pointer(visc))
+                        self.status.libalphamelts.getMeltsViscosity(pointer(failure), model, pointer(temperature), bulk, pointer(visc))
                 else:
-                    self.status.libalphamelts.getMeltsViscosity(pointer(failure), 'GRD', pointer(temperature), bulk, pointer(visc))
-                self.status.failed = failure.value
+                    self.status.libalphamelts.getMeltsViscosity(pointer(failure), model, pointer(temperature), bulk, pointer(visc))
+                self.status.failed = (failure.value != 0)
             except OSError:
                 print("OSERROR")
 
@@ -907,7 +908,7 @@ class MELTSengine(object):
                     else:
                         self.status.libalphamelts.getMeltsEndMemberProperties(pointer(failure), phase, pointer(temperature), pointer(pressure), \
                             bulk, endmembers, pointer(nCharInName), pointer(numberEndMembers), properties)
-                self.status.failed = failure.value
+                self.status.failed = (failure.value != 0)
             except OSError:
                 print("OSERROR")
 
@@ -998,7 +999,7 @@ class MELTSengine(object):
             else:
                 self.status.libalphamelts.getMeltsSaturationState(pointer(failure), pointer(pressure), \
                     bulk, pointer(temperature), phases, pointer(nCharInName), pointer(numberPhases), properties, phaseIndices)
-            self.status.failed = failure.value
+            self.status.failed = (failure.value != 0)
         except OSError:
             print("OSERROR")
 

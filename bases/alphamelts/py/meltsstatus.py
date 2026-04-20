@@ -53,7 +53,7 @@ class MELTSstatus(object):
         errorString = create_string_buffer(50)
 
         self.libalphamelts.getMeltsVersionString(pointer(failure), errorString, pointer(nCharInString))
-        self.failed = failure.value
+        self.failed = (failure.value != 0)
         self.message = errorString.value.decode()
 
         self.libalphamelts.addConsole()
@@ -90,7 +90,7 @@ class MELTSstatus(object):
 
         self.libalphamelts.getMeltsPhaseNames(pointer(failure), phaseNames, pointer(nCharInName), pointer(numberPhases), phaseIndices)
 
-        self.failed = failure.value
+        self.failed = (failure.value != 0)
         phaseNames = phaseNames.value.decode()
         phaseNames = phaseNames.lower()
         self.phases = phaseNames.split()
