@@ -694,8 +694,8 @@ class MELTSengine(object):
             propArr = [0.0] * nc
             properties = (c_double * len(propArr)) (*propArr)
 
-            phaseComposition = self.phaseComposition
-            bulk = (c_double * len(phaseComposition)) (*phaseComposition)
+            molarComposition = self.molarComposition
+            bulk = (c_double * len(molarComposition)) (*molarComposition)
             temperature = c_double(self.temperature+273.15)
             pressure = c_double(self.pressure)
 
